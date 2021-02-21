@@ -21,12 +21,18 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/', (req, res) => {
-    res.render('home')
+    res.render('home');
 })
 
 app.get('/campgrounds', async (req, res) => {
     const allCampgrounds = await Campground.find({});
-    res.render('campgrounds/index', {campgrounds: allCampgrounds})
+    res.render('campgrounds/index', {campgrounds: allCampgrounds});
+})
+
+app.get('/campgrounds/:id', async (req, res) => {
+    const {id} = req.params;
+    const foundCampground = await Campground.findById(id);
+    res.render('campgrounds/show', {campground: foundCampground});
 })
 
 app.listen(3000, () => {
