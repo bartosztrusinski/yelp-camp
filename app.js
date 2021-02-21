@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const Campground = require('./models/campground')
+const methodOverride = require('method-override');
+const Campground = require('./models/campground');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -21,6 +22,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'))
 
 app.get('/', (req, res) => {
     res.render('home');
@@ -35,16 +37,28 @@ app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new')
 })
 
+app.post('/campgrounds', async (req, res) => {
+    const newCampground = new Campground(req.body.campground);
+    await newCampground.save();
+    res.redirect(`/campgrounds/${newCampground._id}`);
+})
+
 app.get('/campgrounds/:id', async (req, res) => {
     const {id} = req.params;
     const foundCampground = await Campground.findById(id);
     res.render('campgrounds/show', {campground: foundCampground});
 })
 
-app.post('/campgrounds', async (req, res) => {
-    const newCampground = new Campground(req.body.campground);
-    await newCampground.save();
-    res.redirect(`/campgrounds/${newCampground._id}`);
+app.get('/campgrounds/:id/edit', async (req, res) => {
+    const {id} = req.params;
+    const foundCampground = await Campground.findById(id);
+    res.render('campgrounds/edit', {campground: foundCampground});
+})
+
+app.put('/campgrounds/:id', async (req, res) => {
+    const {id} = req.params;
+    const updatedCampground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
+    res.redirect(`/campgrounds/${updatedCampground._id}`)
 })
 
 app.listen(3000, () => {
