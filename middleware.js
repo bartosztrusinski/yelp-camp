@@ -11,6 +11,6 @@ module.exports.notLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         return next();
     }
-    req.flash("success", "You are already signed in.");
+    req.flash('success', 'You are already signed in.');
     res.redirect('/campgrounds');
 };
