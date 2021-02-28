@@ -6,16 +6,17 @@ const router = express.Router();
 const {notLoggedIn} = require('../middleware');
 const users = require('../controllers/users');
 
-router.get('/register', notLoggedIn, users.renderRegister)
+router.route('/register')
+    .get(notLoggedIn, users.renderRegister)
+    .post(notLoggedIn, catchAsync(users.register))
 
-router.post('/register', notLoggedIn, catchAsync(users.register))
-
-router.get('/login', notLoggedIn, users.renderLogin)
-
-router.post('/login', notLoggedIn, passport.authenticate('local', {
-    failureFlash: true,
-    failureRedirect: '/login'
-}), users.login)
+router.route('/login')
+    .get(notLoggedIn, users.renderLogin)
+    .post(notLoggedIn,
+        passport.authenticate('local', {
+            failureFlash: true,
+            failureRedirect: '/login'
+        }), users.login)
 
 router.get('/logout', users.logout)
 
