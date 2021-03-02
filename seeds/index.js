@@ -27,6 +27,10 @@ const seedDB = async () => {
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
             price,
+            geometry: {
+                type: 'Point',
+                coordinates: [-113.1331, 47.0202]
+            },
             description: 'Lee parley pillage ye furl bilged on her anchor aft clap of thunder lookout provost. Ballast hardtack trysail gun pirate bounty fire ship hornswaggle Davy Jones\' Locker jolly boat. Reef sails maroon lookout case shot rope\'s end Sail ho interloper lee port hail-shot.\n' +
                 '\n' +
                 'Holystone pressgang cutlass barque haul wind deadlights line Pirate Round fire in the hole walk the plank. Pillage scurvy parley to go on account Sea Legs aye sloop Pirate Round draft mutiny. Galleon square-rigged boatswain reef six pounders hulk hearties lookout schooner transom.\n' +
