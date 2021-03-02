@@ -19,7 +19,7 @@ const sample = array => array[Math.floor(Math.random() * array.length)]
 
 const seedDB = async () => {
     await Campground.deleteMany({});
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 300; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
         const camp = new Campground({
@@ -29,7 +29,7 @@ const seedDB = async () => {
             price,
             geometry: {
                 type: 'Point',
-                coordinates: [-113.1331, 47.0202]
+                coordinates: [cities[random1000].longitude, cities[random1000].latitude]
             },
             description: 'Lee parley pillage ye furl bilged on her anchor aft clap of thunder lookout provost. Ballast hardtack trysail gun pirate bounty fire ship hornswaggle Davy Jones\' Locker jolly boat. Reef sails maroon lookout case shot rope\'s end Sail ho interloper lee port hail-shot.\n' +
                 '\n' +
