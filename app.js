@@ -2,6 +2,7 @@
 //#SKRYPTY DOSTEPNE NA KAZDEJ STRONIE, LINKI I SKRYPTY NA OSOBNYCH STRONACH
 //#DODAC DOMYSLNA POZYCJE NA MAPIE
 //#DODAC DWA OBRAZY NA HOME
+//#AJAX - LADOWANIE CAMPGROUND DATA - MAPY XSS
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
@@ -18,6 +19,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const mongoSanitize = require('express-mongo-sanitize');
 // const catchAsync = require('./utils/catchAsync');
 // const Campground = require('./models/campground');
 // const Review = require('./models/review');
@@ -49,6 +51,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
+app.use(mongoSanitize());
 
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret!',
