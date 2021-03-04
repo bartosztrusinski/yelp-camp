@@ -55,11 +55,11 @@ module.exports.renderEditForm = async (req, res) => {
 module.exports.updateCampground = async (req, res) => {
     const {id} = req.params;
     const updatedCampground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
-    const imgs = req.files.map(f => ({url: f.path, filename: f.filename}))
-    updatedCampground.images.push(...imgs);
+    const newImgs = req.files.map(f => ({url: f.path, filename: f.filename}))
+    updatedCampground.images.push(...newImgs);
     await updatedCampground.save();
     if (req.body.deleteImages) {
-        for(let filename of req.body.deleteImages){
+        for (let filename of req.body.deleteImages) {
             await cloudinary.uploader.destroy(filename);
         }
         await updatedCampground.updateOne({$pull: {images: {filename: {$in: req.body.deleteImages}}}});

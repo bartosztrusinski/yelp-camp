@@ -2,6 +2,7 @@ const {campgroundSchema, reviewSchema} = require('./schemas');
 const ExpressError = require('./utils/ExpressError');
 const Campground = require('./models/campground');
 const Review = require("./models/review");
+const {cloudinary} = require('./cloudinary');
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -20,9 +21,12 @@ module.exports.notLoggedIn = (req, res, next) => {
     res.redirect('/campgrounds');
 };
 
-module.exports.validateCampground = (req, res, next) => {
+module.exports.validateCampground = async (req, res, next) => {
     const {error} = campgroundSchema.validate(req.body);
     if (error) {
+        for (let file of req.files) {
+            await cloudinary.uploader.destroy(file.filename);
+        }
         const msg = error.details.map(el => el.message).join(',');
         throw new ExpressError(msg, 400);
     } else {
@@ -58,4 +62,49 @@ module.exports.isReviewAuthor = async (req, res, next) => {
         return res.redirect(`/campgrounds/${id}`);
     }
     next();
+}
+
+module.exports.validateImageCount = async (req, res, next) => {
+    const {id} = req.params;
+    const foundCampground = await Campground.findById(id);
+    console.log(req.files);
+
+    var deleteImagesLength;
+
+    if (req.body.deleteImages) {
+        deleteImagesLength = req.body.deleteImages.length;
+    } else {
+        deleteImagesLength = 0;
+    }
+
+    if (foundCampground.images.length + req.files.length - deleteImagesLength > 3) {
+        for (let file of req.files) {
+            await cloudinary.uploader.destroy(file.filename);
+        }
+        // req.flash('error', 'Campground cannot have more than 3 images');
+        // return res.redirect(`/campgrounds/${id}/edit`);
+        throw new ExpressError('Campground cannot have more than 3 images', 400);
+    }
+    next();
+
+
+    // if (req.body.deleteImages) {
+    //     if (foundCampground.images.length + req.files.length - req.body.deleteImages.length > 3) {
+    //         for (let file of req.files) {
+    //             await cloudinary.uploader.destroy(file.filename);
+    //         }
+    //         req.flash('error', 'Campground cannot have more than 3 images');
+    //         return res.redirect(`/campgrounds/${id}/edit`);
+    //     }
+    //     next();
+    // } else {
+    //     if (foundCampground.images.length + req.files.length > 3) {
+    //         for (let file of req.files) {
+    //             await cloudinary.uploader.destroy(file.filename);
+    //         }
+    //         req.flash('error', 'Campground cannot have more than 3 images');
+    //         return res.redirect(`/campgrounds/${id}/edit`);
+    //     }
+    //     next();
+    // }
 }
