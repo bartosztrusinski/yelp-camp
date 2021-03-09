@@ -30,13 +30,10 @@ module.exports.campgroundSchema = Joi.object({
             .min(3)
             .max(30)
             .escapeHTML(),
-
         price: Joi.number()
             .required()
             .min(0)
             .max(100),
-        //#FIX IMAGE VALIDATION
-        // image: Joi.string().required(),
         location: Joi.string()
             .required()
             .min(3)
@@ -46,9 +43,18 @@ module.exports.campgroundSchema = Joi.object({
             .required()
             .min(10)
             .max(500)
-            .escapeHTML()
+            .escapeHTML(),
+        images: Joi.array().items(
+            Joi.object({
+                url: Joi.string()
+                    .required(),
+                filename: Joi.string()
+                    .required()
+            }).required()
+        ).max(3)
+
     }).required(),
-    deleteImages: Joi.array()
+    deleteImages: Joi.array().max(3)
 })
 
 module.exports.reviewSchema = Joi.object({

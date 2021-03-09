@@ -1,13 +1,3 @@
-//#LIMIT OBRAZKOW X, WIELKOSC OBRAZKOW X, WALIDACJA OBRAZKOW, STYLE OBRAZKOW, ALLOWED FORMATS X, THUMBNAIL ALIGNMENT, DEFAULT IMAGE, TRANSFORMATION API - CLOUDINARY
-//#SKRYPTY DOSTEPNE NA KAZDEJ STRONIE, LINKI I SKRYPTY NA OSOBNYCH STRONACH
-//#DODAC DOMYSLNA POZYCJE NA MAPIE
-//#DODAC DWA OBRAZY NA HOME
-//#AJAX - LADOWANIE CAMPGROUND DATA - MAPY XSS
-//# ADMIN, PROFILE, CONTACT, SEARCH, MAPBOX SEARCH, STYLES & FONTS
-//#WIADOWOSCI DO WALIDACJI FORMULARZY, IKONY DO FORM.
-//#USER JOI SCHEMA
-//#AJAX FORMS
-
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
@@ -75,6 +65,7 @@ app.use(flash());
 app.use(helmet());
 
 const scriptSrcUrls = [
+    "https://code.jquery.com/",
     "https://stackpath.bootstrapcdn.com/",
     "https://api.tiles.mapbox.com/",
     "https://api.mapbox.com/",

@@ -5,9 +5,15 @@
     <div class="col-6">
         <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
+                <% if(!campground.images.length){ %>
+                    <div class="carousel-item active">
+                        <img src="https://res.cloudinary.com/bartoszt/image/upload/q_100,w_500,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png"
+                             class="d-block w-100" alt="camp image">
+                    </div>
+                <% } %>
                 <% for(let [i, image] of campground.images.entries()){ %>
                     <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
-                        <img src="<%= image.url %>" class="d-block w-100" alt="camp image">
+                        <img src="<%= image.square %>" class="d-block w-100" alt="camp image">
                     </div>
                 <% } %>
             </div>

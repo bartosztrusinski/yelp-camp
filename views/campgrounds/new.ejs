@@ -7,21 +7,21 @@
                 <form action="/campgrounds" method="POST" novalidate class="validated-form"
                       enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label class="form-label" for="title">Title</label>
+                        <label class="form-label lead" for="title">Title</label>
                         <input class="form-control" type="text" id="title" name="campground[title]" required>
                         <div class="valid-feedback">
                             Looks good!
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="location">Location</label>
+                        <label class="form-label lead" for="location">Location</label>
                         <input class="form-control" type="text" id="location" name="campground[location]" required>
                         <div class="valid-feedback">
                             Looks good!
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="price">Campground Price</label>
+                        <label class="form-label lead" for="price">Campground Price</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="price-label">$</span>
                             <input type="text" class="form-control" aria-label="price" aria-describedby="price-label"
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="description">Description</label>
+                        <label class="form-label lead" for="description">Description</label>
                         <textarea class="form-control" type="text" id="description" name="campground[description]"
                                   required></textarea>
                         <div class="valid-feedback">
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="image" class="form-label">Upload Images</label>
+                        <label for="image" class="form-label lead">Upload Images</label>
                         <input class="form-control" type="file" id="image" name="image" multiple>
                     </div>
                     <div class="mb-3">

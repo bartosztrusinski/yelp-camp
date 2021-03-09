@@ -20,7 +20,6 @@ const upload = multer({
 
 router.route('/')
     .get(catchAsync(campgrounds.index))
-    //#FIX VALIDATE SHOULD BE BEFORE UPLOADING IMAGES
     .post(isLoggedIn, upload.array('image', 3), catchAsync(validateCampground), catchAsync(campgrounds.createCampground))
 
 router.get('/new', isLoggedIn, campgrounds.renderNewForm)

@@ -67,7 +67,7 @@ module.exports.isReviewAuthor = async (req, res, next) => {
 module.exports.validateImageCount = async (req, res, next) => {
     const {id} = req.params;
     const foundCampground = await Campground.findById(id);
-    console.log(req.files);
+    // console.log(req.files);
 
     var deleteImagesLength;
 

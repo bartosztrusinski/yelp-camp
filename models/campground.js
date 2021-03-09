@@ -4,21 +4,51 @@ const Schema = mongoose.Schema;
 const {cloudinary} = require('../cloudinary');
 
 const imageSchema = new Schema({
-    url: String,
-    filename: String
+    url: {
+        type: String,
+        required: true
+    },
+    filename: {
+        type: String,
+        required: true
+    }
 })
 
 imageSchema.virtual('thumbnail').get(function () {
-    return this.url.replace('/upload', '/upload/w_200')
+    return this.url.replace('/upload', '/upload/q_100,w_200,ar_1:1,c_fill,g_center,x_0,y_0')
+})
+
+imageSchema.virtual('square').get(function () {
+    return this.url.replace('/upload', '/upload/q_100,w_500,ar_1:1,c_fill,g_center,x_0,y_0')
 })
 
 const opts = {toJSON: {virtuals: true}};
 
 const campgroundSchema = new Schema({
-    title: String,
-    price: Number,
-    description: String,
-    location: String,
+    title: {
+        type: String,
+        required: true,
+        min: 3,
+        max: 30
+    },
+    price: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 100
+    },
+    description: {
+        type: String,
+        required: true,
+        min: 10,
+        max: 500,
+    },
+    location: {
+        type: String,
+        min: 3,
+        max: 100,
+        required: true
+    },
     geometry: {
         type: {
             type: String,
@@ -55,15 +85,9 @@ campgroundSchema.post('findOneAndDelete', async function (doc) {
                 $in: doc.reviews
             }
         })
-        console.log(doc);
         for (let image of doc.images) {
             await cloudinary.uploader.destroy(image.filename)
         }
-        // for (let filename of req.body.deleteImages) {
-        //     await cloudinary.uploader.destroy(filename);
-        // }
-        // await updatedCampground.updateOne({$pull: {images: {filename: {$in: req.body.deleteImages}}}});
-
     }
 })
 
