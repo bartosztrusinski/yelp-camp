@@ -1,5 +1,5 @@
 <%- layout('layouts/boilerplate') %>
-<link rel="stylesheet" href="/css/delete-checkbox.css">
+<% block('head').append('<link rel="stylesheet" href="/css/delete-checkbox.css">') %>
 
 <div class="row">
     <h1 class="text-center mb-4">Edit Campground</h1>
@@ -78,3 +78,5 @@
         </div>
     </div>
 </div>
+
+<% block('footer').append('<script src="/js/validateForms.js"></script>') %>

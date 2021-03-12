@@ -1,5 +1,8 @@
 <%- layout('layouts/boilerplate') %>
-<link rel="stylesheet" href="/css/stars.css">
+<% block('head').append('<link rel="stylesheet" href="/css/app.css">') %>
+<% block('head').append('<link rel="stylesheet" href="/css/stars.css">') %>
+<% block('head').append('<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>') %>
+<% block('head').append('<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css">') %>
 
 <div class="row">
     <div class="col-6">
@@ -109,4 +112,6 @@
     const mapToken = '<%- process.env.MAPBOX_TOKEN %>';
     const campground = <%- JSON.stringify(campground) %>;
 </script>
-<script src="/js/showPageMap.js"></script>
+
+<% block('footer').append('<script src="/js/showPageMap.js"></script>') %>
+<% block('footer').append('<script src="/js/validateForms.js"></script>') %>
