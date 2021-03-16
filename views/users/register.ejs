@@ -7,30 +7,33 @@
                 <img src="https://images.unsplash.com/photo-1492648272180-61e45a8d98a7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
                      alt="" class="card-img-top">
                 <div class="card-body">
-                    <h5 class="card-title">Register</h5>
-                    <form action="/register" method="POST" class="validated-form" novalidate>
-                        <div class="mb-3">
-                            <label class="form-label" for="username">Username</label>
-                            <input class="form-control" type="text" id="username" name="username" required>
-                            <div class="valid-feedback">
+                    <h1 class="mb-4 card-title display-4 fs-2 text-center">Register</h1>
+                    <form action="/register" method="POST" class="validated-form user-form" novalidate>
+                        <div>
+                            <label class="form-label visually-hidden" for="username">Username</label>
+                            <input class="form-control" type="text" id="username" name="username" placeholder="Username"
+                                   required autofocus>
+                            <div class="valid-feedback mb-2">
                                 Looks good!
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="email">Email</label>
-                            <input class="form-control" type="email" id="email" name="email" required>
-                            <div class="valid-feedback">
+                        <div>
+                            <label class="form-label visually-hidden" for="email">Email</label>
+                            <input class="form-control" type="email" id="email" name="email" placeholder="Email address"
+                                   required>
+                            <div class="valid-feedback mb-2">
                                 Looks good!
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="password">Password</label>
-                            <input class="form-control" type="password" id="password" name="password" required>
-                            <div class="valid-feedback">
+                        <div>
+                            <label class="form-label visually-hidden" for="password">Password</label>
+                            <input class="form-control" type="password" id="password" name="password"
+                                   placeholder="Password" required>
+                            <div class="valid-feedback mb-2">
                                 Looks good!
                             </div>
                         </div>
-                        <div class="d-grid">
+                        <div class="d-grid mt-4">
                             <button class="btn btn-success">Register</button>
                         </div>
                     </form>

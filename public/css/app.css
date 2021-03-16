@@ -1,9 +1,25 @@
 #cluster-map {
     width: 100%;
-    height: 550px;
+    height: 50vh;
 }
 
 #map {
     width: 100%;
     height: 300px;
+}
+
+
+.user-form #username {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.user-form #email {
+    border-radius: 0;
+}
+
+.user-form #password {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }

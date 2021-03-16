@@ -19,7 +19,7 @@ imageSchema.virtual('thumbnail').get(function () {
 })
 
 imageSchema.virtual('square').get(function () {
-    return this.url.replace('/upload', '/upload/q_100,w_500,ar_1:1,c_fill,g_center,x_0,y_0')
+    return this.url.replace('/upload', '/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0')
 })
 
 const opts = {toJSON: {virtuals: true}};

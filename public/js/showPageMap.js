@@ -9,13 +9,12 @@ const map = new mapboxgl.Map({
 
 map.addControl(new mapboxgl.NavigationControl());
 
-const el = document.createElement('div');
-el.className = 'marker';
-el.style.backgroundImage = 'url(https://res.cloudinary.com/bartoszt/image/upload/w_40,h_40/v1615597373/camp_marker_3.png)';
-el.style.width = '40px';
-el.style.height = '40px';
+const marker = document.createElement('div');
+marker.style.backgroundImage = 'url("https://res.cloudinary.com/bartoszt/image/upload/w_40,h_40/v1615597373/camp_marker_3.png")';
+marker.style.width = '40px';
+marker.style.height = '40px';
 
-new mapboxgl.Marker(el)
+new mapboxgl.Marker(marker)
     .setLngLat(campground.geometry.coordinates)
     .setPopup(
         new mapboxgl.Popup({
