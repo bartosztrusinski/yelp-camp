@@ -4,33 +4,34 @@
 <% block('head').append('<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css">') %>
 
 <div id="cluster-map"></div>
-<h1 class="display-4 mb-5">All Campgrounds</h1>
-<% for(let campground of campgrounds){ %>
-    <div class="card mb-3">
-        <div class="row">
-            <div class="col-md-4">
-                <% if(campground.images.length){ %>
-                    <img src="<%= campground.images[0].square %>" alt="" class="img-fluid">
-                <% } else { %>
-                    <img src="https://res.cloudinary.com/bartoszt/image/upload/q_100,w_500,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png"
-                         alt="" class="img-fluid">
-                <% } %>
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title"><%= campground.title %></h5>
-                    <p class="card-text"><%= campground.description.substr(0, 200) %>...</p>
-                    <p class="card-text">
-                        <small class="text-muted"><%= campground.location %></small>
-                    </p>
-                    <a href="/campgrounds/<%= campground._id %>"
-                       class="btn btn-primary">View <%= campground.title %></a>
+<div class="container my-5">
+    <h1 class="display-4 mb-4">All Campgrounds</h1>
+    <% for(let campground of campgrounds){ %>
+        <div class="card mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <% if(campground.images.length){ %>
+                        <img src="<%= campground.images[0].square %>" alt="" class="img-fluid">
+                    <% } else { %>
+                        <img src="https://res.cloudinary.com/bartoszt/image/upload/q_100,w_500,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png"
+                             alt="" class="img-fluid">
+                    <% } %>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= campground.title %></h5>
+                        <p class="card-text"><%= campground.description.substr(0, 200) %>...</p>
+                        <p class="card-text">
+                            <small class="text-muted"><%= campground.location %></small>
+                        </p>
+                        <a href="/campgrounds/<%= campground._id %>"
+                           class="btn btn-primary">View <%= campground.title %></a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-<% } %>
-
+    <% } %>
+</div>
 <script>
     const mapToken = '<%- process.env.MAPBOX_TOKEN %>';
     const campgrounds = {features: <%- JSON.stringify(campgrounds) %>}

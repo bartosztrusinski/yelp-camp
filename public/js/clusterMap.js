@@ -35,11 +35,11 @@ map.on('load', function () {
             'circle-color': [
                 'step',
                 ['get', 'point_count'],
-                '#00BCD4',
+                '#99d98c',
                 10,
-                '#2196F3',
+                '#76c893',
                 30,
-                '#3F51B5'
+                '#52b69a'
             ],
             'circle-radius': [
                 'step',
@@ -71,10 +71,8 @@ map.on('load', function () {
         source: 'campgrounds',
         filter: ['!', ['has', 'point_count']],
         paint: {
-            'circle-color': '#11b4da',
+            'circle-color': '#b5e48c',
             'circle-radius': 8,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
         }
     });
 
@@ -120,10 +118,22 @@ map.on('load', function () {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
 
-        new mapboxgl.Popup()
+        new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: true,
+            closeOnMove: true,
+            className: 'rounded-3 text-center fs-6 lh-base'
+        })
             .setLngLat(coordinates)
             .setHTML(popUpMarkup)
             .addTo(map);
+    });
+
+    map.on('mouseenter', 'unclustered-point', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'unclustered-point', function () {
+        map.getCanvas().style.cursor = '';
     });
 
     map.on('mouseenter', 'clusters', function () {
