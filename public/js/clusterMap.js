@@ -3,7 +3,8 @@ const map = new mapboxgl.Map({
     container: 'cluster-map',
     style: 'mapbox://styles/mapbox/light-v10',
     center: [-103.59179687498357, 40.66995747013945],
-    zoom: 3
+    zoom: 2,
+    minZoom: 1,
 });
 
 // map.scrollZoom.disable();
@@ -90,7 +91,7 @@ map.on('load', function () {
     map.on('click', 'unclustered-point', function (e) {
         const {popUpMarkup} = e.features[0].properties;
         const coordinates = e.features[0].geometry.coordinates.slice();
-        
+
         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
