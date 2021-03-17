@@ -15,6 +15,10 @@ const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const redis = require('redis');
+const redisStore = require('connect-redis')(session);
+
 // const catchAsync = require('./utils/catchAsync');
 // const Campground = require('./models/campground');
 // const Review = require('./models/review');
@@ -34,8 +38,21 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp', {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-    console.log('Database connected');
+    console.log('Connected to mongodb successfully');
 });
+
+const redisClient = redis.createClient({
+    host: 'redis-10268.c135.eu-central-1-1.ec2.cloud.redislabs.com',
+    port: 10268,
+    password: process.env.REDIS_PASSWORD
+})
+
+redisClient.on('error', (err) => {
+    console.log('Redis error: ', err);
+})
+redisClient.on('connect', (err) => {
+    console.log('Connected to redis successfully');
+})
 
 const app = express();
 
@@ -47,18 +64,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(mongoSanitize());
+app.use(cookieParser('thisshouldbeabettersecret!'));
 
 const sessionConfig = {
     name: 'session',
     secret: 'thisshouldbeabettersecret!',
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    rolling: true,
+    saveUninitialized: false,
     cookie: {
         httpOnly: true,
         // secure: true, //for https
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-    }
+    },
+    store: new redisStore({client: redisClient})
 }
 app.use(session(sessionConfig));
 app.use(flash());
@@ -110,9 +128,11 @@ app.use(
     })
 );
 
+
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
+
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
