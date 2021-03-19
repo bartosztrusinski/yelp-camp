@@ -3,7 +3,7 @@ const User = require('../models/user');
 const catchAsync = require('../utils/catchAsync');
 const passport = require('passport');
 const router = express.Router();
-const {notLoggedIn} = require('../middleware');
+const {isLoggedIn, notLoggedIn, isActive, isRememberMeChecked} = require('../middleware');
 const users = require('../controllers/users');
 
 router.route('/register')
@@ -14,21 +14,21 @@ router.route('/login')
     .get(notLoggedIn, users.renderLogin)
     .post(
         notLoggedIn,
+        catchAsync(isActive),
         passport.authenticate('local', {
             failureFlash: true,
             failureRedirect: '/login'
         }),
-        function (req, res, next) {
-            if (req.body.remember_me) {
-                req.session.cookie.maxAge = 1000 * 60 * 60 * 24; //1 day
-            } else {
-                req.session.cookie.maxAge = 1000 * 60 * 10; //10 min
-            }
-            return next();
-        },
+        isRememberMeChecked,
         users.login
     );
 
-router.get('/logout', users.logout)
+router.get('/logout', isLoggedIn, users.logout)
+
+router.get('/verify/:token', notLoggedIn, catchAsync(users.verifyUser))
+
+router.route('/resend')
+    .get(notLoggedIn, users.renderResendForm)
+    .post(notLoggedIn, catchAsync(users.resendMail))
 
 module.exports = router;

@@ -1,7 +1,8 @@
 const {campgroundSchema, reviewSchema} = require('./schemas');
 const ExpressError = require('./utils/ExpressError');
 const Campground = require('./models/campground');
-const Review = require("./models/review");
+const Review = require('./models/review');
+const User = require('./models/user');
 const {cloudinary} = require('./cloudinary');
 
 module.exports.isLoggedIn = (req, res, next) => {
@@ -13,11 +14,30 @@ module.exports.isLoggedIn = (req, res, next) => {
     next();
 }
 
+module.exports.isActive = async (req, res, next) => {
+    const foundUser = await User.findOne({username: req.body.username})
+    if (!foundUser) return next();
+    if (!foundUser.isActive) {
+        req.flash('error', `Your email has not been verified. Please click <a href='/resend'>here</a> to resend token!`);
+        return res.redirect('/login');
+    }
+    next();
+}
+
+module.exports.isRememberMeChecked = (req, res, next) => {
+    if (req.body.remember_me) {
+        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30; //30 days
+    } else {
+        req.session.cookie.maxAge = 1000 * 60 * 30; //30 min
+    }
+    next();
+}
+
 module.exports.notLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         return next();
     }
-    req.flash('success', 'You are already signed in.');
+    req.flash('success', 'You are already verified and signed in.');
     res.redirect('/campgrounds');
 };
 
