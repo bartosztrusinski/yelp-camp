@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const {nanoid} = require('nanoid');
 
-const verificationTokenSchema = new Schema({
+const Token = new Schema({
     _id: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -20,6 +20,6 @@ const verificationTokenSchema = new Schema({
     }
 })
 
-const verificationToken = mongoose.model('verificationToken', verificationTokenSchema);
+module.exports.VerificationToken = mongoose.model('verificationToken', Token);
 
-module.exports = verificationToken;
+module.exports.PasswordToken = mongoose.model('passwordToken', Token);

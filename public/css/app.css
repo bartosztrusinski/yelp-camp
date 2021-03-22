@@ -16,6 +16,7 @@
 
 .user-form #email {
     border-radius: 0;
+    margin-bottom: -1px;
 }
 
 .user-form #password {
@@ -23,6 +24,20 @@
     border-top-right-radius: 0;
 }
 
-#rememberMe {
+.user-form #rememberMe {
     cursor: pointer;
+    /*background-color: #198754;*/
+    border-color: #198754;
+}
+
+.user-form #rememberMe:checked {
+    background-color: #198754;
+}
+
+.user-form #rememberMe:focus {
+    box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
+}
+
+.user-form #rememberMe + label {
+    color: inherit;
 }

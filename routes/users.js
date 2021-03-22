@@ -1,5 +1,5 @@
 const express = require('express');
-const User = require('../models/user');
+// const User = require('../models/user');
 const catchAsync = require('../utils/catchAsync');
 const passport = require('passport');
 const router = express.Router();
@@ -27,8 +27,16 @@ router.get('/logout', isLoggedIn, users.logout)
 
 router.get('/verify/:token', notLoggedIn, catchAsync(users.verifyUser))
 
+router.route('/reset/:token')
+    .get(notLoggedIn, users.renderResetForm)
+    .post(notLoggedIn, catchAsync(users.resetPassword))
+
 router.route('/resend')
     .get(notLoggedIn, users.renderResendForm)
-    .post(notLoggedIn, catchAsync(users.resendMail))
+    .post(notLoggedIn, catchAsync(users.sendVerifyMail))
+
+router.route('/forgot')
+    .get(notLoggedIn, users.renderForgotForm)
+    .post(notLoggedIn, catchAsync(users.sendPasswordMail))
 
 module.exports = router;
