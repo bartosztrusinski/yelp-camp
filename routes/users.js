@@ -36,6 +36,12 @@ const failPasswordReset = function (req, res, next, nextValidRequestDate) {
     res.redirect(`/reset/${req.params.token}`);
 };
 
+const failAccountCreate = function (req, res, next, nextValidRequestDate) {
+    req.flash('error', "You've made too many user accounts, please try again in " +
+        formatDistanceToNowStrict(nextValidRequestDate));
+    res.redirect(`/register`);
+};
+
 const handleStoreError = function (error) {
     log.error(error); // log this error so we can figure out what went wrong
     // cause node to exit, hopefully restarting the process fixes the problem
@@ -53,7 +59,7 @@ const passwordResetBruteForce = new ExpressBrute(store, {
     handleStoreError: handleStoreError
 });
 
-const userBruteforce = new ExpressBrute(store, {
+const loginBruteforce = new ExpressBrute(store, {
     freeRetries: 3,
     minWait: 20 * 1000, // 20 seconds
     maxWait: 45 * 1000, // 45 seconds
@@ -61,15 +67,25 @@ const userBruteforce = new ExpressBrute(store, {
     handleStoreError: handleStoreError
 });
 
+const registerBruteforce = new ExpressBrute(store, {
+    freeRetries: 4,
+    attachResetToRequest: false,
+    refreshTimeoutOnRequest: false,
+    minWait: 25 * 60 * 60 * 1000, // 1 day 1 hour (should never reach this wait time)
+    maxWait: 25 * 60 * 60 * 1000, // 1 day 1 hour (should never reach this wait time)
+    lifetime: 24 * 60 * 60, // 1 day (seconds not milliseconds)
+    failCallback: failAccountCreate,
+    handleStoreError: handleStoreError
+});
 
 router.route('/register')
     .get(notLoggedIn, users.renderRegister)
-    .post(notLoggedIn, validateUser, catchAsync(users.register))
+    .post(notLoggedIn, validateUser, registerBruteforce.prevent, catchAsync(users.register))
 
 router.route('/login')
     .get(notLoggedIn, users.renderLogin)
     .post(
-        userBruteforce.getMiddleware({
+        loginBruteforce.getMiddleware({
             key: function (req, res, next) {
                 // prevent too many attempts for the same username
                 next(req.body.username);
