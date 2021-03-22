@@ -33,8 +33,10 @@ module.exports.renderLogin = (req, res) => {
 module.exports.login = async (req, res) => {
     const redirectUrl = req.session.returnTo || '/campgrounds';
     delete req.session.returnTo;
-    req.flash('success', 'Welcome back!');
-    res.redirect(redirectUrl);
+    req.brute.reset(function () {
+        req.flash('success', 'Welcome back!');
+        res.redirect(redirectUrl);
+    });
 }
 
 module.exports.logout = (req, res) => {

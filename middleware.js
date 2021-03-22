@@ -64,24 +64,29 @@ module.exports.validateReview = (req, res, next) => {
     }
 }
 
-module.exports.isAuthor = async (req, res, next) => {
-    const {id} = req.params;
-    const foundCampground = await Campground.findById(id);
-    if (!foundCampground.author.equals(req.user._id)) {
-        req.flash('error', 'You do not have permission to do that');
-        return res.redirect(`/campgrounds/${id}`);
-    }
-    next();
+const isAdmin = function(user){
+    if(user.isAdmin)return true;
+    return false;
 }
 
-module.exports.isReviewAuthor = async (req, res, next) => {
+module.exports.isAuthorOrAdmin = async (req, res, next) => {
+    const {id} = req.params;
+    const foundCampground = await Campground.findById(id);
+    if (foundCampground.author.equals(req.user._id) || req.user.isAdmin) {
+        return next();
+    }
+    req.flash('error', 'You do not have permission to do that');
+    return res.redirect(`/campgrounds/${id}`);
+}
+
+module.exports.isReviewAuthorOrAdmin = async (req, res, next) => {
     const {reviewId, id} = req.params;
     const foundReview = await Review.findById(reviewId);
-    if (!foundReview.author.equals(req.user._id)) {
-        req.flash('error', 'You do not have permission to do that');
-        return res.redirect(`/campgrounds/${id}`);
+    if (foundReview.author.equals(req.user._id) || req.user.isAdmin) {
+        return next();
     }
-    next();
+    req.flash('error', 'You do not have permission to do that');
+    return res.redirect(`/campgrounds/${id}`);
 }
 
 module.exports.validateImageCount = async (req, res, next) => {

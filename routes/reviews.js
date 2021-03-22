@@ -5,12 +5,12 @@ const Review = require('../models/review');
 // const {reviewSchema} = require('../schemas');
 const catchAsync = require('../utils/catchAsync');
 // const ExpressError = require('../utils/ExpressError');
-const {validateReview, isLoggedIn, isReviewAuthor} = require('../middleware');
+const {validateReview, isLoggedIn, isReviewAuthorOrAdmin} = require('../middleware');
 const reviews = require('../controllers/reviews');
 
 
 router.post('/', isLoggedIn, validateReview, catchAsync(reviews.createReview))
 
-router.delete('/:reviewId', isLoggedIn, isReviewAuthor, catchAsync(reviews.destroyReview))
+router.delete('/:reviewId', isLoggedIn, isReviewAuthorOrAdmin, catchAsync(reviews.destroyReview))
 
 module.exports = router;

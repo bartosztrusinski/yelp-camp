@@ -5,6 +5,41 @@ const passport = require('passport');
 const router = express.Router();
 const {isLoggedIn, notLoggedIn, isActive, isRememberMeChecked} = require('../middleware');
 const users = require('../controllers/users');
+const ExpressBrute = require('express-brute');
+const redis = require('redis');
+const RedisStore = require('express-brute-redis');
+const formatDistanceToNowStrict = require('date-fns/formatDistanceToNowStrict');
+
+const redisClient = redis.createClient({
+    host: 'redis-10268.c135.eu-central-1-1.ec2.cloud.redislabs.com',
+    port: 10268,
+    password: process.env.REDIS_PASSWORD
+})
+const store = new RedisStore({client: redisClient});
+
+const failCallback = function (req, res, next, nextValidRequestDate) {
+    req.flash('error', "You've made too many failed attempts in a short period of time, please try again in " +
+        formatDistanceToNowStrict(nextValidRequestDate));
+    res.redirect('/login');
+};
+
+const handleStoreError = function (error) {
+    log.error(error); // log this error so we can figure out what went wrong
+    // cause node to exit, hopefully restarting the process fixes the problem
+    throw {
+        message: error.message,
+        parent: error.parent
+    };
+}
+
+const userBruteforce = new ExpressBrute(store, {
+    freeRetries: 3,
+    minWait: 20 * 1000, // 20 seconds
+    maxWait: 45 * 1000, // 45 seconds
+    failCallback: failCallback,
+    handleStoreError: handleStoreError
+});
+
 
 router.route('/register')
     .get(notLoggedIn, users.renderRegister)
@@ -13,6 +48,12 @@ router.route('/register')
 router.route('/login')
     .get(notLoggedIn, users.renderLogin)
     .post(
+        userBruteforce.getMiddleware({
+            key: function (req, res, next) {
+                // prevent too many attempts for the same username
+                next(req.body.username);
+            }
+        }),
         notLoggedIn,
         catchAsync(isActive),
         passport.authenticate('local', {

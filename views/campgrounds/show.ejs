@@ -44,7 +44,7 @@
                     <li class="list-group-item">Submitted by <%= campground.author.username %></li>
                     <li class="list-group-item">$<%= campground.price %>/night</li>
                 </ul>
-                <% if(currentUser && campground.author.equals(currentUser)) { %>
+                <% if(currentUser && (campground.author.equals(currentUser) || currentUser.isAdmin)) { %>
                     <div class="card-body">
                         <a href="/campgrounds/<%= campground._id %>/edit" class="card-link btn btn-info">Edit</a>
                         <form class="d-inline" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
@@ -113,7 +113,7 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div class="m-2"><%= review.body %></div>
-                            <% if(currentUser && review.author.equals(currentUser)){ %>
+                            <% if(currentUser && (review.author.equals(currentUser) || currentUser.isAdmin)){ %>
                                 <div>
                                     <form action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"
                                           method="POST">
@@ -122,22 +122,7 @@
                                 </div>
                             <% } %>
                         </li>
-
                     </ul>
-                    <!--                    <div class="card-body">-->
-                    <!--                        <h5 class="card-title"><%= review.author.username.toUpperCase() %></h5>-->
-                    <!--                        <span class="starability-result" data-rating="<%= review.rating %>">-->
-                    <!--                            Rated: <%= review.rating %> stars-->
-                    <!--                        </span>-->
-                    <!--                        <hr>-->
-                    <!--                        <p class="card-text"><%= review.body %></p>-->
-                    <!--                    <% if(currentUser && review.author.equals(currentUser)){ %>-->
-                    <!--                        <form action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"-->
-                    <!--                              method="POST">-->
-                    <!--                            <button class="btn btn-sm btn-danger">Delete</button>-->
-                    <!--                        </form>-->
-                    <!--                    <% } %>-->
-                    <!--                                        </div>-->
                 </div>
             <% } %>
         </div>
