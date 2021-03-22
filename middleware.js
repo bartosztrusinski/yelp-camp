@@ -1,4 +1,4 @@
-const {campgroundSchema, reviewSchema} = require('./schemas');
+const {campgroundSchema, reviewSchema, userSchema, passwordSchema} = require('./schemas');
 const ExpressError = require('./utils/ExpressError');
 const Campground = require('./models/campground');
 const Review = require('./models/review');
@@ -64,9 +64,24 @@ module.exports.validateReview = (req, res, next) => {
     }
 }
 
-const isAdmin = function(user){
-    if(user.isAdmin)return true;
-    return false;
+module.exports.validateUser = (req, res, next) => {
+    const {error} = userSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+
+module.exports.validatePassword = (req, res, next) => {
+    const {error} = passwordSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
 }
 
 module.exports.isAuthorOrAdmin = async (req, res, next) => {

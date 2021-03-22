@@ -16,7 +16,7 @@ const Token = new Schema({
     dateCreated: {
         type: Date,
         default: Date.now(),
-        expires: 60 * 60 * 24
+        expires: 60 * 60 // 1 hour
     }
 })
 

@@ -70,3 +70,26 @@ module.exports.reviewSchema = Joi.object({
             .max(5)
     }).required()
 })
+
+module.exports.userSchema = Joi.object({
+    email: Joi.string()
+        .required()
+        .email()
+        .escapeHTML(),
+    username: Joi.string()
+        .required()
+        .min(3)
+        .max(30)
+        .escapeHTML(),
+    password: Joi.string()
+        .required()
+        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}'))
+        .escapeHTML(),
+})
+
+module.exports.passwordSchema = Joi.object({
+    password: Joi.string()
+        .required()
+        .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}'))
+        .escapeHTML()
+})

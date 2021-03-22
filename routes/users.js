@@ -3,7 +3,14 @@ const express = require('express');
 const catchAsync = require('../utils/catchAsync');
 const passport = require('passport');
 const router = express.Router();
-const {isLoggedIn, notLoggedIn, isActive, isRememberMeChecked} = require('../middleware');
+const {
+    isLoggedIn,
+    notLoggedIn,
+    isActive,
+    isRememberMeChecked,
+    validateUser,
+    validatePassword
+} = require('../middleware');
 const users = require('../controllers/users');
 const ExpressBrute = require('express-brute');
 const redis = require('redis');
@@ -17,10 +24,16 @@ const redisClient = redis.createClient({
 })
 const store = new RedisStore({client: redisClient});
 
-const failCallback = function (req, res, next, nextValidRequestDate) {
-    req.flash('error', "You've made too many failed attempts in a short period of time, please try again in " +
+const failLogin = function (req, res, next, nextValidRequestDate) {
+    req.flash('error', "You've made too many failed attempts to log in, please try again in " +
         formatDistanceToNowStrict(nextValidRequestDate));
     res.redirect('/login');
+};
+
+const failPasswordReset = function (req, res, next, nextValidRequestDate) {
+    req.flash('error', "You've made too many failed attempts to reset password, please try again in " +
+        formatDistanceToNowStrict(nextValidRequestDate));
+    res.redirect(`/reset/${req.params.token}`);
 };
 
 const handleStoreError = function (error) {
@@ -32,18 +45,26 @@ const handleStoreError = function (error) {
     };
 }
 
+const passwordResetBruteForce = new ExpressBrute(store, {
+    freeRetries: 3,
+    minWait: 20 * 1000, // 20 seconds
+    maxWait: 45 * 1000, // 45 seconds
+    failCallback: failPasswordReset,
+    handleStoreError: handleStoreError
+});
+
 const userBruteforce = new ExpressBrute(store, {
     freeRetries: 3,
     minWait: 20 * 1000, // 20 seconds
     maxWait: 45 * 1000, // 45 seconds
-    failCallback: failCallback,
+    failCallback: failLogin,
     handleStoreError: handleStoreError
 });
 
 
 router.route('/register')
     .get(notLoggedIn, users.renderRegister)
-    .post(notLoggedIn, catchAsync(users.register))
+    .post(notLoggedIn, validateUser, catchAsync(users.register))
 
 router.route('/login')
     .get(notLoggedIn, users.renderLogin)
@@ -70,7 +91,17 @@ router.get('/verify/:token', notLoggedIn, catchAsync(users.verifyUser))
 
 router.route('/reset/:token')
     .get(notLoggedIn, users.renderResetForm)
-    .post(notLoggedIn, catchAsync(users.resetPassword))
+    .post(
+        notLoggedIn,
+        passwordResetBruteForce.getMiddleware({
+            key: function (req, res, next) {
+                // prevent too many attempts for the same token
+                next(req.params.token);
+            }
+        }),
+        validatePassword,
+        catchAsync(users.resetPassword)
+    )
 
 router.route('/resend')
     .get(notLoggedIn, users.renderResendForm)

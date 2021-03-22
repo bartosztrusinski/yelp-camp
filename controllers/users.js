@@ -12,15 +12,10 @@ module.exports.register = async (req, res) => {
     const {username, email, password} = req.body;
     const user = new User({email, username});
     const registeredUser = await User.register(user, password);
-
     await VerificationToken.findOneAndDelete({_id: registeredUser._id})
-
     const newToken = new VerificationToken({_id: registeredUser._id});
-
     const savedToken = await newToken.save();
-
     await transporter.sendMail(verificationMail(registeredUser, savedToken.token, req.headers.host))
-
     req.flash('success', `A verification email has been sent to ${registeredUser.email}. It will be expire after one day. 
                                 If you did not get verification email, click <a href='/resend'>here</a> to resend token!`)
     res.redirect('/campgrounds');
@@ -46,7 +41,7 @@ module.exports.logout = (req, res) => {
 }
 
 module.exports.renderResendForm = (req, res) => {
-    res.render('users/resend', {
+    res.render('users/sendToken', {
         title: 'Verify Account',
         description: 'We will resend you an email with instructions on how to verify your account',
         action: '/resend'
@@ -61,8 +56,8 @@ module.exports.sendVerifyMail = async (req, res) => {
     const newToken = new VerificationToken({_id: foundUser._id})
     const savedToken = await newToken.save();
     await transporter.sendMail(verificationMail(foundUser, savedToken.token, req.headers.host))
-    req.flash('success', `A verification email has been sent to ${foundUser.email}. It will be expire after one day. 
-                                If you did not get verification email, click <a href='/resend'>here</a> to resend token!`)
+    req.flash('success', `A verification email has been sent to ${foundUser.email}. It will be expire after one hour. 
+                                If you did not get the email, click <a href='/resend'>here</a> to resend token!`)
     res.redirect('/campgrounds');
 }
 
@@ -80,7 +75,7 @@ module.exports.verifyUser = async (req, res) => {
 
 
 module.exports.renderForgotForm = (req, res) => {
-    res.render('users/resend', {
+    res.render('users/sendToken', {
         title: 'Forgot Password',
         description: 'We will send you an email with instructions on how to reset your password',
         action: '/forgot'
@@ -97,7 +92,8 @@ module.exports.sendPasswordMail = async (req, res) => {
     newToken.token = await bcrypt.hash(newToken.token, 12);
     await newToken.save();
     await transporter.sendMail(passwordMail(foundUser, token, req.headers.host))
-    req.flash('success', `A password reset email has been sent to ${foundUser.email}. It will be expire after one day.`)
+    req.flash('success', `A password reset email has been sent to ${foundUser.email}. It will be expire after one hour.
+                            If you did not get the email, click <a href='/forgot'>here</a> to resend token!`)
     res.redirect('/campgrounds');
 }
 
