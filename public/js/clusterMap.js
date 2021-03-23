@@ -11,7 +11,13 @@ const map = new mapboxgl.Map({
 map.doubleClickZoom.disable();
 
 map.on('load', function () {
-    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl
+        })
+    );
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
     map.addSource('campgrounds', {
         type: 'geojson',
         data: campgrounds,
@@ -69,6 +75,7 @@ map.on('load', function () {
             'circle-radius': 8,
         }
     });
+
 
     map.on('click', 'clusters', function (e) {
         const features = map.queryRenderedFeatures(e.point, {
