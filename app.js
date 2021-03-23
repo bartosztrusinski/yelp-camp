@@ -16,8 +16,9 @@ const User = require('./models/user');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const redis = require('redis');
-const redisStore = require('connect-redis')(session);
+// const redis = require('redis');
+// const redisStore = require('connect-redis')(session);
+const {RedisSessionStore: redisStore, redisClient} = require('./redis');
 
 // const catchAsync = require('./utils/catchAsync');
 // const Campground = require('./models/campground');
@@ -38,20 +39,20 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp', {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-    console.log('Connected to mongodb successfully');
+    console.log('Connected to Database');
 });
 
-const redisClient = redis.createClient({
-    host: 'redis-10268.c135.eu-central-1-1.ec2.cloud.redislabs.com',
-    port: 10268,
-    password: process.env.REDIS_PASSWORD
-})
+// const redisClient = redis.createClient({
+//     host: 'redis-10268.c135.eu-central-1-1.ec2.cloud.redislabs.com',
+//     port: 10268,
+//     password: process.env.REDIS_PASSWORD
+// })
 
 redisClient.on('error', (err) => {
     console.log('Redis error: ', err);
 })
 redisClient.on('connect', (err) => {
-    console.log('Connected to redis successfully');
+    console.log('Connected to Redis session');
 })
 
 const app = express();
