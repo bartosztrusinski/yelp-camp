@@ -19,8 +19,8 @@ const cookieParser = require('cookie-parser');
 // const redis = require('redis');
 // const redisStore = require('connect-redis')(session);
 const {RedisSessionStore: redisStore, redisClient} = require('./redis');
-
-// const catchAsync = require('./utils/catchAsync');
+const {transporter, contactMail} = require('./utils/mailTransport');
+const catchAsync = require('./utils/catchAsync');
 // const Campground = require('./models/campground');
 // const Review = require('./models/review');
 // const {campgroundSchema, reviewSchema} = require('./schemas');
@@ -146,6 +146,17 @@ app.use('/campgrounds/:id/reviews', reviewRoutes);
 app.get('/', (req, res) => {
     res.render('home');
 })
+
+app.get('/contact', (req, res) => {
+    res.render('contact');
+})
+
+app.post('/contact', catchAsync(async (req, res) => {
+    const {name, email, message} = req.body;
+    await transporter.sendMail(contactMail(name, email, message));
+    req.flash('success', 'A contact message has been sent! Please await for our response');
+    res.redirect('/campgrounds');
+}))
 
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404));

@@ -1,41 +1,41 @@
 <%- layout('layouts/boilerplate') %>
 <% block('head').append('<link rel="stylesheet" href="/css/app.css">') %>
 
-<div class="d-flex container justify-content-center align-items-center mt-5">
+<div class="d-flex container justify-content-center align-items-center my-5">
     <div class="row">
         <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-4">
             <div class="card shadow">
                 <img src="https://images.unsplash.com/photo-1492648272180-61e45a8d98a7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
                      alt="" class="card-img-top">
                 <div class="card-body">
-                    <h1 class="mb-4 card-title display-4 fs-2 text-center">Register</h1>
-                    <form action="/register" method="POST" class="validated-form user-form" novalidate>
+                    <h1 class="mb-4 card-title display-4 fs-2 text-center">Get In Touch</h1>
+                    <form action="/contact" method="POST" class="validated-form user-form" novalidate>
                         <div class="form-floating">
-                            <input class="form-control" type="text" id="username" name="username" placeholder="Username"
+                            <input class="form-control" type="text" id="name" name="name" placeholder="Name"
                                    required autofocus>
-                            <label class="form-label" for="username">Username</label>
+                            <label class="form-label" for="name">Name</label>
                             <div class="valid-feedback mb-2">
                                 Looks good!
                             </div>
                         </div>
                         <div class="form-floating">
-                            <input class="form-control" type="email" id="email" name="email" placeholder="Email address"
-                                   required>
+                            <input class="form-control" type="email" id="email" name="email"
+                                   placeholder="Email address" required>
                             <label class="form-label" for="email">Email address</label>
                             <div class="valid-feedback mb-2">
                                 Looks good!
                             </div>
                         </div>
                         <div class="form-floating">
-                            <input class="form-control" type="password" id="password" name="password"
-                                   placeholder="Password" required>
-                            <label class="form-label" for="password">Password</label>
+                            <textarea class="form-control" id="message" name="message" placeholder="Message"
+                                      required></textarea>
+                            <label class="form-label" for="message">Message</label>
                             <div class="valid-feedback mb-2">
                                 Looks good!
                             </div>
                         </div>
                         <div class="d-grid mt-4">
-                            <button class="btn btn-success">Register</button>
+                            <button class="btn btn-success">Submit</button>
                         </div>
                     </form>
                 </div>

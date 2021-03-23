@@ -38,3 +38,19 @@ module.exports.passwordMail = function (user, token, host) {
                 <a href='http://localhost:3000/reset/${token}?id=${user._id}'>Click here to verify!</a>`,
     }
 }
+
+module.exports.contactMail = function (name, email, message) {
+    return {
+        from: '"Yelp Camp 🏕" <yelp@camp.com>',
+        to: process.env.EMAIL_ADDRESS,
+        subject: "Yelp Camp - Contact Message",
+        text: name + ' sent message: \n\n' +
+            message + '\n',
+        html: `<h1>${name} sent message:</h1>
+                <pre>${message}</pre>
+                <ul>
+                    <li>Name: ${name}</li>
+                    <li>Email address: ${email}</li>
+                </ul>`,
+    }
+}

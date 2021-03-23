@@ -8,7 +8,7 @@
     height: 300px;
 }
 
-.user-form #username {
+.user-form #username, .user-form #name {
     margin-bottom: -1px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
@@ -20,6 +20,12 @@
 }
 
 .user-form #password {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.user-form #message {
+    height: 150px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
