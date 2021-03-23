@@ -37,7 +37,7 @@ module.exports.login = async (req, res) => {
 module.exports.logout = (req, res) => {
     req.logout();
     req.flash('success', 'Goodbye!');
-    res.redirect('/campgrounds');
+    res.redirect('back');
 }
 
 module.exports.renderResendForm = (req, res) => {

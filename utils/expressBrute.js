@@ -15,15 +15,9 @@ const handleStoreError = function (error) {
 const failCallback = function (message) {
     return function (req, res, next, nextValidRequestDate) {
         req.flash('error', `${message} ${formatDistanceToNowStrict(nextValidRequestDate)}`);
-        res.redirect(req.originalUrl);
+        res.redirect('back');
     };
 }
-
-const failReviewCreate = function (req, res, next, nextValidRequestDate) {
-    req.flash('error', "You've made too many reviews, please try again in " +
-        formatDistanceToNowStrict(nextValidRequestDate));
-    res.redirect(`/campgrounds/${req.params.id}`);
-};
 
 const globalOptions = function (retries, seconds) {
     return {
@@ -68,5 +62,5 @@ module.exports.campgroundCreateBruteForce = new ExpressBrute(store, {
 
 module.exports.reviewCreateBruteForce = new ExpressBrute(store, {
     ...globalOptions(9, 60 * 60),
-    failCallback: failReviewCreate,
+    failCallback: failCallback("You've made too many reviews, please try again in"),
 });

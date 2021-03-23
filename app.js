@@ -42,12 +42,6 @@ db.once('open', () => {
     console.log('Connected to Database');
 });
 
-// const redisClient = redis.createClient({
-//     host: 'redis-10268.c135.eu-central-1-1.ec2.cloud.redislabs.com',
-//     port: 10268,
-//     password: process.env.REDIS_PASSWORD
-// })
-
 redisClient.on('error', (err) => {
     console.log('Redis error: ', err);
 })

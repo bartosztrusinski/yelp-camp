@@ -40,21 +40,27 @@
                     <p class="card-text"><%= campground.description %></p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item text-muted"><%= campground.location %></li>
-                    <li class="list-group-item">Submitted by <%= campground.author.username %></li>
-                    <li class="list-group-item">$<%= campground.price %>/night</li>
+                    <li class="list-group-item text-muted d-flex flex-row flex-md-column flex-xl-row justify-content-between py-3">
+                        <span><strong>Location:</strong> <%= campground.location %></span>
+                        <span><strong>Created:</strong> <%= campground.dateFormatted %></span>
+                    </li>
+                    <li class="list-group-item py-3">
+                        <strong>Price:</strong> $<%= campground.price %>/night
+                    </li>
+                    <li class="list-group-item d-flex flex-row flex-md-column flex-xl-row justify-content-between align-items-baseline py-3">
+                        <div class="mb-1">Submitted by <strong><%= campground.author.username %></strong></div>
+                        <% if(currentUser && (campground.author.equals(currentUser) || currentUser.isAdmin)) { %>
+                            <div class="mb-1">
+                                <a href="/campgrounds/<%= campground._id %>/edit"
+                                   class="card-link btn btn-info">Edit</a>
+                                <form class="d-inline" action="/campgrounds/<%= campground._id %>?_method=DELETE"
+                                      method="POST">
+                                    <button class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        <% } %>
+                    </li>
                 </ul>
-                <% if(currentUser && (campground.author.equals(currentUser) || currentUser.isAdmin)) { %>
-                    <div class="card-body">
-                        <a href="/campgrounds/<%= campground._id %>/edit" class="card-link btn btn-info">Edit</a>
-                        <form class="d-inline" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
-                            <button class="btn btn-danger">Delete</button>
-                        </form>
-                    </div>
-                <% } %>
-                <div class="card-footer text-muted">
-                    2 days ago
-                </div>
             </div>
         </div>
         <div class="col-md-6">
@@ -104,9 +110,12 @@
             <% } %>
             <% for(let review of campground.reviews){ %>
                 <div class="card my-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="m-2 fs-5 fw-bold"><%= review.author.username %></div>
-                        <span class="starability-result" data-rating="<%= review.rating %>">
+                    <div class="card-header d-flex justify-content-between align-items-md-start align-items-xl-center align-items-sm-center flex-md-column flex-xl-row ">
+                        <div class="d-flex flex-column mb-1">
+                            <span class="fs-5 fw-bold"><%= review.author.username %></span>
+                            <span class="text-muted"><%= review.dateFormatted %></span>
+                        </div>
+                        <span class="starability-result mb-1" data-rating="<%= review.rating %>">
                             Rated: <%= review.rating %> stars
                         </span>
                     </div>

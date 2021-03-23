@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const Schema = mongoose.Schema;
 const {cloudinary} = require('../cloudinary');
+const format = require('date-fns/format')
 
 const imageSchema = new Schema({
     url: {
@@ -49,6 +50,11 @@ const campgroundSchema = new Schema({
         max: 100,
         required: true
     },
+    dateCreated: {
+        type: Date,
+        default: Date.now,
+        required: true
+    },
     geometry: {
         type: {
             type: String,
@@ -75,6 +81,10 @@ const campgroundSchema = new Schema({
 
 campgroundSchema.virtual('properties.popUpMarkup').get(function () {
     return `<strong>${this.title}</strong><br><a href="/campgrounds/${this._id}" class="text-decoration-none badge bg-success text-white text-wrap text-uppercase">Show Camp</a>`
+})
+
+campgroundSchema.virtual('dateFormatted').get(function () {
+    return format(this.dateCreated, "dd-MM-yyyy");
 })
 
 campgroundSchema.post('findOneAndDelete', async function (doc) {
