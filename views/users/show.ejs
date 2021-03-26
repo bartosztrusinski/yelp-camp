@@ -1,0 +1,89 @@
+<%- layout('layouts/boilerplate') %>
+<% block('head').append('<link rel="stylesheet" href="/css/app.css">') %>
+<% block('head').append('<link rel="stylesheet" href="/css/stars.css">') %>
+
+<div class="container my-5">
+    <h2 class="display-4 mb-4 text-md-start text-center">User Profile</h2>
+    <div class="row">
+        <div class="col-sm-10 offset-sm-1 offset-md-0 col-md-6 col-xl-4">
+            <div class="card mb-3">
+                <% if(user.profilePicture){ %>
+                    <img src="<%= user.profilePicture.circle %>"
+                         class="img-fluid d-block w-50 mx-auto pt-3" alt="profile picture">
+                <% } else { %>
+                    <img src="https://res.cloudinary.com/bartoszt/image/upload/c_fill,g_auto:face,r_max,w_500,ar_1:1/v1616588583/user_profile.png"
+                         class="img-fluid d-block w-50 mx-auto pt-3" alt="profile picture">
+                <% } %>
+                <div class="card-body text-center">
+                    <h1 class="card-title display-4 fs-2"><%= user.username %></h1>
+                    <% if(user.name){ %>
+                        <p class="card-text"><%= user.name %></p>
+                    <% } %>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <% if(user.email.public || user.phoneNumber){ %>
+                        <li class="list-group-item text-muted d-flex flex-column justify-content-between py-3">
+                            <% if(user.email.public){ %>
+                                <span><strong>Email:</strong> <%= user.email.address %></span>
+                            <% } %>
+                            <% if(user.phoneNumber){ %>
+                                <span><strong>Phone Number:</strong> +<%= user.phoneNumber %></span>
+                            <% } %>
+                        </li>
+                    <% } %>
+                    <% if(user.bio){ %>
+                        <li class="list-group-item py-3">
+                            <strong>Bio</strong>
+                            <div><%= user.bio %></div>
+                        </li>
+                    <% } else { %>
+                        <li class="list-group-item py-3">
+                            <i>No user bio</i>
+                        </li>
+                    <% } %>
+                    <% if(currentUser && (currentUser.equals(user) || currentUser.isAdmin)) { %>
+                        <li class="list-group-item d-flex flex-row flex-md-column flex-xl-row justify-content-between align-items-baseline py-3">
+                            <div class="mb-1">
+                                <a href="/users/<%= user._id %>/edit"
+                                   class="card-link btn btn-info">Edit Profile</a>
+                                <form class="d-inline" action="/users/<%= user._id %>?_method=DELETE"
+                                      method="POST">
+                                    <button class="btn btn-danger">Delete Profile</button>
+                                </form>
+                            </div>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-8">
+            <% if(user.campgrounds && user.campgrounds.length){ %>
+                <h2 class="fs-2 fw-light mb-4 text-md-start text-center">Campgrounds <%= user.username %>
+                    created</h2>
+            <% } else { %>
+                <h2 class="fs-2 fw-light mb-4 text-md-start text-center">No campgrounds created</h2>
+            <% } %>
+            <div class="row">
+                <% for(let campground of user.campgrounds){ %>
+                    <div class="col-lg-6 d-flex align-items-stretch">
+                        <div class="card mb-3">
+                            <% if(campground.images.length){ %>
+                                <img src="<%= campground.images[0].square %>" alt="" class="card-img-top">
+                            <% } else { %>
+                                <img src="https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png"
+                                     alt="" class="card-img-top">
+                            <% } %>
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <h5 class="card-title m-0"><%= campground.title %></h5>
+                                <p class="card-text mb-2">
+                                    <small class="text-muted"><%= campground.location %></small>
+                                </p>
+                                <a href="/campgrounds/<%= campground._id %>" class="btn btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -16,7 +16,7 @@ module.exports.register = async (req, res) => {
     const newToken = new VerificationToken({_id: registeredUser._id});
     const savedToken = await newToken.save();
     await transporter.sendMail(verificationMail(registeredUser, savedToken.token, req.headers.host))
-    req.flash('success', `A verification email has been sent to ${registeredUser.email}. It will be expire after one day. 
+    req.flash('success', `A verification email has been sent to ${registeredUser.email.address}. It will be expire after one day. 
                                 If you did not get verification email, click <a href='/resend'>here</a> to resend token!`)
     res.redirect('/campgrounds');
 }
@@ -26,11 +26,12 @@ module.exports.renderLogin = (req, res) => {
 }
 
 module.exports.login = async (req, res) => {
-    const redirectUrl = req.session.returnTo || '/campgrounds';
-    delete req.session.returnTo;
+    // const redirectUrl = req.session.returnTo || '/campgrounds';
+    // delete req.session.returnTo;
     req.brute.reset(function () {
         req.flash('success', 'Welcome back!');
-        res.redirect(redirectUrl);
+        // res.redirect(redirectUrl);
+        res.redirect('/campgrounds');
     });
 }
 
@@ -117,4 +118,33 @@ module.exports.resetPassword = async (req, res) => {
     await PasswordToken.findByIdAndDelete(foundToken._id);
     req.flash('success', 'Successfully Changed Your Password!');
     res.redirect('/login');
+}
+
+module.exports.renderUserProfile = async (req, res) => {
+    const {id} = req.params;
+    const foundUser = await User.findById(id).populate('campgrounds');
+    res.render('users/show', {user: foundUser});
+}
+
+module.exports.renderEditForm = async (req, res) => {
+    const {id} = req.params;
+    const userToEdit = await User.findById(id);
+    res.render('users/edit', {user: userToEdit});
+}
+
+module.exports.updateUserProfile = async (req, res) => {
+    const {id} = req.params;
+    const {name, bio, showEmail, phoneNumber} = req.body;
+    const userToUpdate = await User.findByIdAndUpdate(id, {name, bio, phoneNumber})
+    userToUpdate.email.public = showEmail === 'yes';
+    await userToUpdate.save();
+    req.flash('success', 'Successfully updated profile!');
+    res.redirect(`/users/${userToUpdate._id}`);
+}
+
+module.exports.deleteUser = async (req, res) => {
+    const {id} = req.params;
+    await User.findByIdAndDelete(id);
+    req.flash('success', 'Successfully deleted user!');
+    res.redirect('/campgrounds');
 }

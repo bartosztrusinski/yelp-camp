@@ -19,6 +19,17 @@
     margin-bottom: -1px;
 }
 
+.user-form #phoneNumber {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.user-form #phonePrefix {
+    border-top-left-radius: 0;
+}
+
+
 .user-form #password {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -30,20 +41,25 @@
     border-top-right-radius: 0;
 }
 
-.user-form #rememberMe {
+.user-form #bio {
+    margin-bottom: -1px;
+    height: 150px;
+    border-radius: 0;
+}
+
+.user-form #rememberMe, .user-form #showEmail, .user-form #deletePicture {
     cursor: pointer;
-    /*background-color: #198754;*/
     border-color: #198754;
 }
 
-.user-form #rememberMe:checked {
+.user-form #rememberMe:checked, .user-form #showEmail:checked, .user-form #deletePicture:checked {
     background-color: #198754;
 }
 
-.user-form #rememberMe:focus {
+.user-form #rememberMe:focus, .user-form #showEmail:focus, .user-form #deletePicture:focus {
     box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
 }
 
-.user-form #rememberMe + label {
+.user-form #rememberMe + label, .user-form #showEmail + label, .user-form #deletePicture + label {
     color: inherit;
 }

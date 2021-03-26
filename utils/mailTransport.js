@@ -13,7 +13,7 @@ module.exports.transporter = nodemailer.createTransport({
 module.exports.verificationMail = function (user, token, host) {
     return {
         from: '"Yelp Camp 🏕" <yelp@camp.com>',
-        to: user.email,
+        to: user.email.address,
         subject: "Yelp Camp - Verify Account",
         text: 'Hello ' + user.username + ',\n\n' +
             'Please verify your account by clicking the link: ' +
@@ -27,7 +27,7 @@ module.exports.verificationMail = function (user, token, host) {
 module.exports.passwordMail = function (user, token, host) {
     return {
         from: '"Yelp Camp 🏕" <yelp@camp.com>',
-        to: user.email,
+        to: user.email.address,
         subject: "Yelp Camp - Reset Password",
         text: 'Hello ' + user.username + ',\n\n' +
             'Please reset your password by clicking the link: ' +

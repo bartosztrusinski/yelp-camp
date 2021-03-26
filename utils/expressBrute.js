@@ -2,6 +2,7 @@ const ExpressBrute = require('express-brute');
 const formatDistanceToNowStrict = require('date-fns/formatDistanceToNowStrict');
 const {redisClient, RedisStore} = require('../redis');
 const store = new RedisStore({client: redisClient});
+const {cloudinary} = require('../cloudinary');
 
 const handleStoreError = function (error) {
     log.error(error); // log this error so we can figure out what went wrong
@@ -14,6 +15,16 @@ const handleStoreError = function (error) {
 
 const failCallback = function (message) {
     return function (req, res, next, nextValidRequestDate) {
+        req.flash('error', `${message} ${formatDistanceToNowStrict(nextValidRequestDate)}`);
+        res.redirect('back');
+    };
+}
+
+const failCampgroundCallback = function (message) {
+    return async function (req, res, next, nextValidRequestDate) {
+        for (let filename of req.body.deleteImages) {
+            await cloudinary.uploader.destroy(filename);
+        }
         req.flash('error', `${message} ${formatDistanceToNowStrict(nextValidRequestDate)}`);
         res.redirect('back');
     };
@@ -57,7 +68,7 @@ module.exports.registerBruteForce = new ExpressBrute(store, {
 
 module.exports.campgroundCreateBruteForce = new ExpressBrute(store, {
     ...globalOptions(4, 24 * 60 * 60),
-    failCallback: failCallback("You've made too many campgrounds, please try again in"),
+    failCallback: failCampgroundCallback("You've made too many campgrounds, please try again in"),
 })
 
 module.exports.reviewCreateBruteForce = new ExpressBrute(store, {

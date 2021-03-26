@@ -1,4 +1,5 @@
 const Campground = require('../models/campground');
+const User = require('../models/user');
 const {cloudinary} = require('../cloudinary');
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapBoxToken = process.env.MAPBOX_TOKEN;
@@ -27,7 +28,10 @@ module.exports.createCampground = async (req, res) => {
     newCampground.images = req.files.map(f => ({url: f.path, filename: f.filename}));
     newCampground.author = req.user._id;
     newCampground.price = Math.round((newCampground.price + Number.EPSILON) * 100) / 100;
+    const campAuthor = await User.findById(req.user._id);
+    campAuthor.campgrounds.push(newCampground);
     await newCampground.save();
+    await campAuthor.save();
     req.flash('success', 'Successfully made a new campground!');
     res.redirect(`/campgrounds/${newCampground._id}`);
 }
@@ -67,7 +71,7 @@ module.exports.updateCampground = async (req, res) => {
 
     const updatedCampground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
     if (!geoData.body.features[0]) {
-        throw new ExpressError('Could not find that place!', 400);
+        throw new ExpressError('Could not find that location!', 400);
     }
     updatedCampground.geometry = geoData.body.features[0].geometry;
     updatedCampground.images.push(...newImgs);

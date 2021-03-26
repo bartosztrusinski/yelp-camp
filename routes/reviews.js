@@ -11,6 +11,6 @@ const {reviewCreateBruteForce} = require('../utils/expressBrute');
 
 router.post('/', isLoggedIn, validateReview, reviewCreateBruteForce.prevent, catchAsync(reviews.createReview))
 
-router.delete('/:reviewId', isLoggedIn, isReviewAuthorOrAdmin, catchAsync(reviews.destroyReview))
+router.delete('/:reviewId', isLoggedIn, catchAsync(isReviewAuthorOrAdmin), catchAsync(reviews.destroyReview))
 
 module.exports = router;

@@ -17,9 +17,9 @@ router.get('/new', isLoggedIn, campgrounds.renderNewForm)
 
 router.route('/:id')
     .get(catchAsync(campgrounds.showCampground))
-    .put(isLoggedIn, isAuthorOrAdmin, upload.array('image', 3), catchAsync(validateImageCount), catchAsync(validateCampground), catchAsync(campgrounds.updateCampground))
-    .delete(isLoggedIn, isAuthorOrAdmin, catchAsync(campgrounds.destroyCampground))
+    .put(isLoggedIn, catchAsync(isAuthorOrAdmin), upload.array('image', 3), catchAsync(validateImageCount), catchAsync(validateCampground), catchAsync(campgrounds.updateCampground))
+    .delete(isLoggedIn, catchAsync(isAuthorOrAdmin), catchAsync(campgrounds.destroyCampground))
 
-router.get('/:id/edit', isLoggedIn, isAuthorOrAdmin, catchAsync(campgrounds.renderEditForm))
+router.get('/:id/edit', isLoggedIn, catchAsync(isAuthorOrAdmin), catchAsync(campgrounds.renderEditForm))
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const {campgroundSchema, reviewSchema, userSchema, passwordSchema} = require('./schemas');
+const {campgroundSchema, reviewSchema, userSchema, passwordSchema, userProfileSchema} = require('./schemas');
 const ExpressError = require('./utils/ExpressError');
 const Campground = require('./models/campground');
 const Review = require('./models/review');
@@ -7,7 +7,7 @@ const {cloudinary} = require('./cloudinary');
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
-        req.session.returnTo = req.originalUrl;
+        // req.session.returnTo = req.originalUrl;
         req.flash('error', 'You must be signed in first!');
         return res.redirect('/login');
     }
@@ -43,6 +43,7 @@ module.exports.notLoggedIn = (req, res, next) => {
 
 module.exports.validateCampground = async (req, res, next) => {
     const {error} = campgroundSchema.validate(req.body);
+    //ADD MIDDLEWARE FOR DELETING
     if (error) {
         for (let file of req.files) {
             await cloudinary.uploader.destroy(file.filename);
@@ -74,6 +75,17 @@ module.exports.validateUser = (req, res, next) => {
     }
 }
 
+module.exports.validateUserProfile = async (req, res, next) => {
+    const {error} = userProfileSchema.validate(req.body, {allowUnknown: true});
+    if (error) {
+        await cloudinary.uploader.destroy(req.file.filename);
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+
 module.exports.validatePassword = (req, res, next) => {
     const {error} = passwordSchema.validate(req.body);
     if (error) {
@@ -82,6 +94,16 @@ module.exports.validatePassword = (req, res, next) => {
     } else {
         next();
     }
+}
+
+module.exports.isProfileOwnerOrAdmin = async (req, res, next) => {
+    const {id} = req.params;
+    const foundUser = await User.findById(id);
+    if(foundUser.equals(req.user) || req.user.isAdmin){
+        return next();
+    }
+    req.flash('error', 'You do not have permission to do that');
+    return res.redirect(`/users/${id}`);
 }
 
 module.exports.isAuthorOrAdmin = async (req, res, next) => {
@@ -119,4 +141,25 @@ module.exports.validateImageCount = async (req, res, next) => {
         throw new ExpressError('Campground cannot have more than 3 images', 400);
     }
     next();
+}
+
+const changeUsersPictureTo = async (id, changeTo) => {
+    const user = await User.findById(id);
+    if (user.profilePicture)
+        await cloudinary.uploader.destroy(user.profilePicture.filename);
+    user.profilePicture = changeTo;
+    await user.save();
+}
+
+module.exports.changeProfilePicture = async (req, res, next) => {
+    const {id} = req.params;
+    if (req.body.deletePicture === 'yes') {
+        await changeUsersPictureTo(id, null);
+        return next();
+    }
+    if (req.file) {
+        const profilePicture = {url: req.file.path, filename: req.file.filename};
+        await changeUsersPictureTo(id, profilePicture);
+    }
+    return next();
 }

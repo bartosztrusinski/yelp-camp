@@ -72,10 +72,12 @@ module.exports.reviewSchema = Joi.object({
 })
 
 module.exports.userSchema = Joi.object({
-    email: Joi.string()
-        .required()
-        .email()
-        .escapeHTML(),
+    email: Joi.object({
+        address: Joi.string()
+            .required()
+            .email()
+            .escapeHTML()
+    }).required(),
     username: Joi.string()
         .required()
         .min(3)
@@ -85,6 +87,27 @@ module.exports.userSchema = Joi.object({
         .required()
         .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}'))
         .escapeHTML(),
+})
+
+module.exports.userProfileSchema = Joi.object({
+    name: Joi.string()
+        .min(5)
+        .max(30)
+        .escapeHTML(),
+    bio: Joi.string()
+        .min(10)
+        .max(200)
+        .escapeHTML(),
+    phoneNumber: Joi.string()
+        .min(6)
+        .max(15)
+        .escapeHTML(),
+    profilePicture: Joi.object({
+        url: Joi.string()
+            .required(),
+        filename: Joi.string()
+            .required()
+    })
 })
 
 module.exports.passwordSchema = Joi.object({

@@ -9,10 +9,14 @@ const {
     isActive,
     isRememberMeChecked,
     validateUser,
-    validatePassword
+    validatePassword,
+    changeProfilePicture,
+    validateUserProfile,
+    isProfileOwnerOrAdmin
 } = require('../middleware');
 const users = require('../controllers/users');
 const {passwordResetBruteForce, loginBruteForce, registerBruteForce} = require('../utils/expressBrute');
+const upload = require('../cloudinary/upload');
 
 router.route('/register')
     .get(notLoggedIn, users.renderRegister)
@@ -62,5 +66,12 @@ router.route('/resend')
 router.route('/forgot')
     .get(notLoggedIn, users.renderForgotForm)
     .post(notLoggedIn, catchAsync(users.sendPasswordMail))
+
+router.route('/users/:id')
+    .get(users.renderUserProfile)
+    .patch(isLoggedIn, catchAsync(isProfileOwnerOrAdmin), upload.single('profilePicture'), catchAsync(validateUserProfile), catchAsync(changeProfilePicture), catchAsync(users.updateUserProfile))
+    .delete(isLoggedIn, catchAsync(isProfileOwnerOrAdmin), users.deleteUser)
+
+router.get('/users/:id/edit', isLoggedIn, catchAsync(isProfileOwnerOrAdmin), users.renderEditForm)
 
 module.exports = router;
