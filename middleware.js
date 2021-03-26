@@ -87,7 +87,7 @@ module.exports.validateUserProfile = async (req, res, next) => {
 }
 
 module.exports.validatePassword = (req, res, next) => {
-    const {error} = passwordSchema.validate(req.body);
+    const {error} = passwordSchema.validate(req.body, {allowUnknown: true});
     if (error) {
         const msg = error.details.map(el => el.message).join(',');
         throw new ExpressError(msg, 400);
@@ -99,7 +99,7 @@ module.exports.validatePassword = (req, res, next) => {
 module.exports.isProfileOwnerOrAdmin = async (req, res, next) => {
     const {id} = req.params;
     const foundUser = await User.findById(id);
-    if(foundUser.equals(req.user) || req.user.isAdmin){
+    if (foundUser.equals(req.user) || req.user.isAdmin) {
         return next();
     }
     req.flash('error', 'You do not have permission to do that');

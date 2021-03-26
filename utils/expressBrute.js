@@ -50,11 +50,15 @@ const options = function (retries, seconds) {
     }
 }
 
-
 module.exports.passwordResetBruteForce = new ExpressBrute(store, {
     ...options(3, 20),
     failCallback: failCallback("You've made too many failed attempts to reset password, please try again in"),
 });
+
+module.exports.passwordChangeBruteForce = new ExpressBrute(store, {
+    ...options(3, 20),
+    failCallback: failCallback("You've made too many failed attempts to change password, please try again in"),
+})
 
 module.exports.loginBruteForce = new ExpressBrute(store, {
     ...options(3, 20),

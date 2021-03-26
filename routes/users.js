@@ -15,7 +15,12 @@ const {
     isProfileOwnerOrAdmin
 } = require('../middleware');
 const users = require('../controllers/users');
-const {passwordResetBruteForce, loginBruteForce, registerBruteForce} = require('../utils/expressBrute');
+const {
+    passwordResetBruteForce,
+    passwordChangeBruteForce,
+    loginBruteForce,
+    registerBruteForce
+} = require('../utils/expressBrute');
 const upload = require('../cloudinary/upload');
 
 router.route('/register')
@@ -70,8 +75,11 @@ router.route('/forgot')
 router.route('/users/:id')
     .get(users.renderUserProfile)
     .patch(isLoggedIn, catchAsync(isProfileOwnerOrAdmin), upload.single('profilePicture'), catchAsync(validateUserProfile), catchAsync(changeProfilePicture), catchAsync(users.updateUserProfile))
-    .delete(isLoggedIn, catchAsync(isProfileOwnerOrAdmin), users.deleteUser)
+    .delete(isLoggedIn, catchAsync(isProfileOwnerOrAdmin), catchAsync(users.deleteUser))
+    .put(isLoggedIn, catchAsync(isProfileOwnerOrAdmin), validatePassword, passwordChangeBruteForce.prevent, catchAsync(users.changePassword));
 
 router.get('/users/:id/edit', isLoggedIn, catchAsync(isProfileOwnerOrAdmin), users.renderEditForm)
+
+router.get('/users/:id/change-password', isLoggedIn, catchAsync(isProfileOwnerOrAdmin), users.renderPasswordChangeForm);
 
 module.exports = router;

@@ -148,3 +148,23 @@ module.exports.deleteUser = async (req, res) => {
     req.flash('success', 'Successfully deleted user!');
     res.redirect('/campgrounds');
 }
+
+module.exports.renderPasswordChangeForm = (req, res) => {
+    const {id} = req.params;
+    res.render('users/changePassword', {id});
+}
+
+module.exports.changePassword = async (req, res) => {
+    const {id} = req.params;
+    const userToUpdate = await User.findById(id);
+    const match = await userToUpdate.authenticate(req.body.currentPassword);
+
+    if (!match.user) throw new ExpressError('The Given Password Is Incorrect!', 400);
+    if (req.body.password !== req.body.passwordRepeat) throw new ExpressError('The Password Fields Must Match!', 400);
+
+    await userToUpdate.setPassword(req.body.password);
+    await userToUpdate.save();
+
+    req.flash('success', 'Successfully Changed Your Password!');
+    res.redirect(`/users/${userToUpdate._id}`);
+}
