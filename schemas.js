@@ -93,14 +93,17 @@ module.exports.userProfileSchema = Joi.object({
     name: Joi.string()
         .min(5)
         .max(30)
+        .allow('')
         .escapeHTML(),
     bio: Joi.string()
         .min(10)
         .max(200)
+        .allow('')
         .escapeHTML(),
     phoneNumber: Joi.string()
         .min(6)
         .max(15)
+        .allow('')
         .escapeHTML(),
     profilePicture: Joi.object({
         url: Joi.string()

@@ -7,7 +7,7 @@ const geocoder = mbxGeocoding({accessToken: mapBoxToken});
 const ExpressError = require('../utils/ExpressError');
 
 module.exports.index = async (req, res) => {
-    const allCampgrounds = await Campground.find({});
+    const allCampgrounds = await Campground.find({}).sort({dateCreated: -1});
     res.render('campgrounds/index', {campgrounds: allCampgrounds});
 }
 
@@ -40,6 +40,9 @@ module.exports.showCampground = async (req, res) => {
     const {id} = req.params;
     const foundCampground = await Campground.findById(id).populate({
         path: 'reviews',
+        options: {
+            sort: {'dateCreated': -1}
+        },
         populate: {
             path: 'author'
         }

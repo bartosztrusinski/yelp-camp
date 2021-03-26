@@ -122,7 +122,7 @@ module.exports.resetPassword = async (req, res) => {
 
 module.exports.renderUserProfile = async (req, res) => {
     const {id} = req.params;
-    const foundUser = await User.findById(id).populate('campgrounds');
+    const foundUser = await User.findById(id).populate({path: 'campgrounds', options: {sort: {'dateCreated': -1}}});
     res.render('users/show', {user: foundUser});
 }
 

@@ -78,7 +78,8 @@ module.exports.validateUser = (req, res, next) => {
 module.exports.validateUserProfile = async (req, res, next) => {
     const {error} = userProfileSchema.validate(req.body, {allowUnknown: true});
     if (error) {
-        await cloudinary.uploader.destroy(req.file.filename);
+        if (req.file)
+            await cloudinary.uploader.destroy(req.file.filename);
         const msg = error.details.map(el => el.message).join(',');
         throw new ExpressError(msg, 400);
     } else {
