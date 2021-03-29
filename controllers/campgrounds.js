@@ -6,9 +6,23 @@ const mapBoxToken = process.env.MAPBOX_TOKEN;
 const geocoder = mbxGeocoding({accessToken: mapBoxToken});
 const ExpressError = require('../utils/ExpressError');
 
+
 module.exports.index = async (req, res) => {
-    const allCampgrounds = await Campground.find({}).sort({dateCreated: -1});
-    res.render('campgrounds/index', {campgrounds: allCampgrounds});
+    if (!req.query.page) {
+        const campgrounds = await Campground.paginate({}, {
+            sort: {dateCreated: -1}
+        });
+        const allCampgrounds = await Campground.find();
+        res.render('campgrounds/index', {campgrounds, allCampgrounds});
+    } else {
+        const {page} = req.query;
+        const campgrounds = await Campground.paginate({}, {
+            page,
+            sort: {dateCreated: -1}
+        });
+        res.status(200).json(campgrounds);
+    }
+
 }
 
 module.exports.renderNewForm = (req, res) => {

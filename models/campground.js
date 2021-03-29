@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const Schema = mongoose.Schema;
 const {cloudinary} = require('../cloudinary');
-const format = require('date-fns/format')
+const format = require('date-fns/format');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
+
+const opts = {toJSON: {virtuals: true}};
 const imageSchema = new Schema({
     url: {
         type: String,
@@ -13,7 +16,7 @@ const imageSchema = new Schema({
         type: String,
         required: true
     }
-})
+}, opts)
 
 imageSchema.virtual('thumbnail').get(function () {
     return this.url.replace('/upload', '/upload/q_100,w_200,ar_1:1,c_fill,g_center,x_0,y_0')
@@ -23,7 +26,6 @@ imageSchema.virtual('square').get(function () {
     return this.url.replace('/upload', '/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0')
 })
 
-const opts = {toJSON: {virtuals: true}};
 
 const campgroundSchema = new Schema({
     title: {
@@ -99,6 +101,8 @@ campgroundSchema.post('findOneAndDelete', async function (doc) {
         }
     }
 })
+
+campgroundSchema.plugin(mongoosePaginate);
 
 const Campground = mongoose.model('Campground', campgroundSchema);
 
