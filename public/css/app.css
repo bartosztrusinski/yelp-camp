@@ -8,7 +8,8 @@
     height: 300px;
 }
 
-.user-form #username, .user-form #name {
+
+.user-form #username, .user-form #name, .user-form #newPassword {
     margin-bottom: -1px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
@@ -17,6 +18,11 @@
 .user-form #email {
     border-radius: 0;
     margin-bottom: -1px;
+}
+
+.user-form #retypePassword {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .user-form #phoneNumber {
@@ -29,24 +35,10 @@
     border-top-left-radius: 0;
 }
 
-.user-form #oldPassword {
-
-}
-
-.user-form #newPassword {
-    margin-bottom: -1px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.user-form #passwordRepeat {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-
 .user-form #password {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    margin-bottom: -1px;
 }
 
 .user-form #message {
@@ -56,9 +48,9 @@
 }
 
 .user-form #bio {
-    margin-bottom: -1px;
     height: 150px;
     border-radius: 0;
+    margin-bottom: -1px;
 }
 
 .user-form #rememberMe, .user-form #showEmail, .user-form #deletePicture {

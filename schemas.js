@@ -87,6 +87,7 @@ module.exports.userSchema = Joi.object({
         .required()
         .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}'))
         .escapeHTML(),
+    retypePassword: Joi.ref('password')
 })
 
 module.exports.userProfileSchema = Joi.object({

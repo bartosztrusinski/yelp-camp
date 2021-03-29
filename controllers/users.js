@@ -9,7 +9,8 @@ module.exports.renderRegister = (req, res) => {
 }
 
 module.exports.register = async (req, res) => {
-    const {username, email, password} = req.body;
+    const {username, email, password, retypePassword} = req.body;
+    if (password !== retypePassword) throw new ExpressError('The Password Fields Must Match!', 400);
     const user = new User({email, username});
     const registeredUser = await User.register(user, password);
     await VerificationToken.findOneAndDelete({_id: registeredUser._id})
@@ -50,14 +51,14 @@ module.exports.renderResendForm = (req, res) => {
 }
 
 module.exports.sendVerifyMail = async (req, res) => {
-    const foundUser = await User.findOne({email: req.body.email})
+    const foundUser = await User.findOne({'email.address': req.body.email})
     if (!foundUser) throw new ExpressError('Could not find that email!', 400);
     if (foundUser.isActive) throw new ExpressError('This account has been already verified. Please log in.', 400);
     await VerificationToken.findOneAndDelete({_id: foundUser._id})
     const newToken = new VerificationToken({_id: foundUser._id})
     const savedToken = await newToken.save();
     await transporter.sendMail(verificationMail(foundUser, savedToken.token, req.headers.host))
-    req.flash('success', `A verification email has been sent to ${foundUser.email}. It will be expire after one hour. 
+    req.flash('success', `A verification email has been sent to ${foundUser.email.address}. It will be expire after one hour. 
                                 If you did not get the email, click <a href='/resend'>here</a> to resend token!`)
     res.redirect('/campgrounds');
 }
@@ -84,7 +85,7 @@ module.exports.renderForgotForm = (req, res) => {
 }
 
 module.exports.sendPasswordMail = async (req, res) => {
-    const foundUser = await User.findOne({email: req.body.email})
+    const foundUser = await User.findOne({'email.address': req.body.email})
     if (!foundUser) throw new ExpressError('Could not find that email!', 400);
     if (!foundUser.isActive) throw new ExpressError('This account needs to be verified first.', 400);
     await PasswordToken.findOneAndDelete({_id: foundUser._id})
@@ -93,7 +94,7 @@ module.exports.sendPasswordMail = async (req, res) => {
     newToken.token = await bcrypt.hash(newToken.token, 12);
     await newToken.save();
     await transporter.sendMail(passwordMail(foundUser, token, req.headers.host))
-    req.flash('success', `A password reset email has been sent to ${foundUser.email}. It will be expire after one hour.
+    req.flash('success', `A password reset email has been sent to ${foundUser.email.address}. It will be expire after one hour.
                             If you did not get the email, click <a href='/forgot'>here</a> to resend token!`)
     res.redirect('/campgrounds');
 }
@@ -107,6 +108,7 @@ module.exports.renderResetForm = (req, res) => {
 module.exports.resetPassword = async (req, res) => {
     const {token} = req.params;
     const {id} = req.query;
+    if (req.body.password !== req.body.retypePassword) throw new ExpressError('The Password Fields Must Match!', 400);
     const foundToken = await PasswordToken.findById(id);
     if (!foundToken) throw new ExpressError('Reset token expired!', 400);
     const isValid = bcrypt.compare(token, foundToken.token);
@@ -160,7 +162,7 @@ module.exports.changePassword = async (req, res) => {
     const match = await userToUpdate.authenticate(req.body.currentPassword);
 
     if (!match.user) throw new ExpressError('The Given Password Is Incorrect!', 400);
-    if (req.body.password !== req.body.passwordRepeat) throw new ExpressError('The Password Fields Must Match!', 400);
+    if (req.body.password !== req.body.retypePassword) throw new ExpressError('The Password Fields Must Match!', 400);
 
     await userToUpdate.setPassword(req.body.password);
     await userToUpdate.save();
