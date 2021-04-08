@@ -17,7 +17,8 @@ const express = require('express')
     , helmet = require('helmet')
     , cookieParser = require('cookie-parser')
     , dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
-    , secret = process.env.SECRET || 'thisshouldbeabettersecret!';
+    , secret = process.env.SECRET || 'thisshouldbeabettersecret!'
+    , port = process.env.PORT || 3000;
 
 const campgroundRoutes = require('./routes/campgrounds')
     , reviewRoutes = require('./routes/reviews')
@@ -139,6 +140,6 @@ app.use((err, req, res, next) => {
     res.status(statusCode).redirect(redirectPath);
 })
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000');
+app.listen(port, () => {
+    console.log(`Serving on port ${port}`);
 })
