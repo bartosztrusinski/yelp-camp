@@ -95,7 +95,10 @@ const deleteImagesUserChose = async(req, camp) => {
 }
 
 module.exports.destroyCampground = async(req, res) => {
-    const campground = res.locals.campground;
+    const campground = res.locals.campground
+        , user = await User.findById(campground.author);
+    if(user)
+        await user.updateOne({$pull: {campgrounds: campground._id}});
     await campground.remove();
     req.flash('success', 'Successfully deleted campground!');
     res.redirect('/campgrounds');

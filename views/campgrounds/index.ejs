@@ -34,10 +34,12 @@
     <% } %>
 </div>
 <div class="text-center my-5">
-    <a href="/campgrounds?page=<%= campgrounds.nextPage %>" class="btn btn-outline-primary btn-lg" id="paginate">
-        View More
-    </a>
-    <p id="end-of-data" class="lead d-none">No Campgrounds Found</p>
+    <% if(campgrounds.docs && campgrounds.hasNextPage){ %>
+        <a href="/campgrounds?page=<%= campgrounds.nextPage %>" class="btn btn-outline-primary btn-lg" id="paginate">
+            View More
+        </a>
+    <% } %>
+    <p id="end-of-data" class="lead <%= campgrounds.totalDocs ? 'd-none' : '' %>">No Campgrounds Found</p>
 </div>
 
 <script>

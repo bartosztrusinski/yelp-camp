@@ -15,7 +15,9 @@ const express = require('express')
     , User = require('./models/user')
     , mongoSanitize = require('express-mongo-sanitize')
     , helmet = require('helmet')
-    , cookieParser = require('cookie-parser');
+    , cookieParser = require('cookie-parser')
+    , dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
+    , secret = process.env.SECRET || 'thisshouldbeabettersecret!';
 
 const campgroundRoutes = require('./routes/campgrounds')
     , reviewRoutes = require('./routes/reviews')
@@ -29,7 +31,7 @@ const {
     fontSrcUrls
 } = require('./allowedUrls');
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -43,10 +45,10 @@ db.once('open', () => {
 });
 
 redisClient.on('error', (err) => {
-    console.log('Redis error: ', err);
+    console.log('Session store error: ', err);
 });
 redisClient.on('connect', () => {
-    console.log('Connected to Redis session');
+    console.log('Connected to Session Store');
 });
 
 const app = express();
@@ -59,11 +61,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(mongoSanitize());
-app.use(cookieParser('thisshouldbeabettersecret!'));
+app.use(cookieParser(secret));
 
 const sessionConfig = {
     name: 'session',
-    secret: 'thisshouldbeabettersecret!',
+    secret,
     resave: true,
     rolling: true,
     saveUninitialized: false,
