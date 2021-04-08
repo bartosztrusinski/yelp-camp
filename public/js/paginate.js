@@ -2,26 +2,34 @@ const paginate = document.querySelector('#paginate')
     , $campgroundsContainer = $('#campgrounds-container')
     , endOfData = document.querySelector('#end-of-data');
 
-paginate.addEventListener('click', function(e) {
-    e.preventDefault();
-    fetch(this.href)
-        .then(response => response.json())
-        .then(data => {
-            const {nextPage} = data;
-            for(let campground of data.docs) {
-                let template = generateTemplate(campground);
-                $campgroundsContainer.append(template);
-            }
-            this.href = this.href.replace(/page=\d+/, `page=${nextPage}`);
-            if(!data.hasNextPage) {
-                this.remove();
-                endOfData.classList.remove('d-none');
-            }
-        })
-        .catch(e => console.log(e));
-});
+if(paginate) {
+    paginate.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const pageData = await requestNextPage(this.href);
+        generatePage(pageData);
+        this.href = this.href.replace(/page=\d+/, `page=${pageData.nextPage}`);
+        handleEndOfData(pageData);
+    });
+}
 
-const generateTemplate = function(campground) {
+const requestNextPage = async function(url) {
+    const response = await fetch(url);
+    if(!response.ok) {
+        const message = `An error has occured: ${response.status}`;
+        throw new Error(message);
+    }
+    const data = await response.json();
+    return data;
+}
+
+const generatePage = function(data) {
+    for(let doc of data.docs) {
+        let template = generateDocTemplate(doc);
+        $campgroundsContainer.append(template);
+    }
+}
+
+const generateDocTemplate = function(campground) {
     return `<article class="card mb-3 mx-3 mx-md-0">
                <div class="row g-0">
                    <div class="col-md-4 col-lg-3">
@@ -40,4 +48,11 @@ const generateTemplate = function(campground) {
                    </div>
                </div>
            </article>`;
+}
+
+const handleEndOfData = function(data) {
+    if(!data.hasNextPage) {
+        paginate.remove();
+        endOfData.classList.remove('d-none');
+    }
 }
