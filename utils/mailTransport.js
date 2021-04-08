@@ -29,7 +29,7 @@ const verificationMail = (user, token) => {
         subject: "Yelp Camp - Verify Account",
         text: 'Hello ' + user.username + ',\n\n' +
             'Please verify your account by clicking the link: \n' +
-            'http://localhost:3000/verify/' + token + '\n\n' +
+            process.env.BASE_URL + '/verify/' + token + '\n\n' +
             'Thank You!\n',
         html: `<h1>Hello, ${user.username}!</h1>
                 <p>Please verify your account by clicking the link below. Thank You!</p>
@@ -44,7 +44,7 @@ const passwordMail = (user, token) => {
         subject: "Yelp Camp - Reset Password",
         text: 'Hello ' + user.username + ',\n\n' +
             'Please reset your password by clicking the link: \n' +
-            'http://localhost:3000/reset/' + token + '?id=' + user._id + '\n\n' +
+            process.env.BASE_URL + '/reset/' + token + '?id=' + user._id + '\n\n' +
             'Thank You!\n',
         html: `<h1>Hello, ${user.username}!</h1>
                 <p>Please reset your password by clicking the link below. Thank You!</p>
