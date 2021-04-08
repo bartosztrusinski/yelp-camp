@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const passportLocalMongoose = require('passport-local-mongoose');
-const Schema = mongoose.Schema;
-const {PasswordToken, VerificationToken} = require('./token');
-const {cloudinary} = require('../cloudinary');
+const mongoose = require('mongoose')
+    , Schema = mongoose.Schema
+    , passportLocalMongoose = require('passport-local-mongoose')
+    , {PasswordToken, VerificationToken} = require('./token')
+    , {cloudinary} = require('../cloudinary');
 
 const imageSchema = new Schema({
     url: {
@@ -11,11 +11,15 @@ const imageSchema = new Schema({
     filename: {
         type: String,
     }
-})
+});
 
-imageSchema.virtual('circle').get(function () {
-    return this.url.replace('/upload', '/upload/c_fill,g_auto:face,r_max,w_300,ar_1:1')
-})
+imageSchema.virtual('rounded').get(function() {
+    return this.url.replace('/upload', '/upload/c_fill,g_auto:face,r_max,w_300,ar_1:1').replace('.jpg', '.png');
+});
+
+imageSchema.virtual('thumbnail').get(function() {
+    return this.url.replace('/upload', '/upload/c_fill,g_auto:face,r_max,w_35,ar_1:1').replace('.jpg', '.png');
+});
 
 const userSchema = new Schema({
     email: {
@@ -62,19 +66,17 @@ const userSchema = new Schema({
             ref: 'Campground'
         }
     ]
-})
-userSchema.plugin(passportLocalMongoose)
+});
 
-userSchema.post('findOneAndDelete', async function (doc) {
-    if (doc) {
-        await VerificationToken.findOneAndDelete({_id: doc._id})
-        await PasswordToken.findOneAndDelete({_id: doc._id})
-        if (doc.profilePicture)
+userSchema.post('remove', async function(doc) {
+    if(doc) {
+        await VerificationToken.findOneAndDelete({_id: doc._id});
+        await PasswordToken.findOneAndDelete({_id: doc._id});
+        if(doc.profilePicture)
             await cloudinary.uploader.destroy(doc.profilePicture.filename);
     }
-})
+});
 
-
+userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;

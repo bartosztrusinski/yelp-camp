@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const {nanoid} = require('nanoid');
+const mongoose = require('mongoose')
+    , Schema = mongoose.Schema
+    , {nanoid} = require('nanoid');
 
 const Token = new Schema({
     _id: {
@@ -15,11 +15,10 @@ const Token = new Schema({
     },
     dateCreated: {
         type: Date,
-        default: Date.now(),
-        expires: 60 * 60 // 1 hour
+        default: Date.now,
+        expires: 60 * 60
     }
-})
+});
 
 module.exports.VerificationToken = mongoose.model('verificationToken', Token);
-
 module.exports.PasswordToken = mongoose.model('passwordToken', Token);

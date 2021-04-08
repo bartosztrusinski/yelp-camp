@@ -1,5 +1,5 @@
 <%- layout('layouts/boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="/css/app.css">') %>
+<% block('head').append('<link rel="stylesheet" href="/css/user-form.css">') %>
 
 <div class="d-flex container justify-content-center align-items-center my-5">
     <div class="row">
@@ -11,7 +11,7 @@
                     <h1 class="mb-4 card-title display-4 fs-2 text-center">Get In Touch</h1>
                     <form action="/contact" method="POST" class="validated-form user-form" novalidate>
                         <div class="form-floating">
-                            <input class="form-control" type="text" id="name" name="name" placeholder="Name"
+                            <input class="form-control top-input" type="text" id="name" name="name" placeholder="Name"
                                    required autofocus>
                             <label class="form-label" for="name">Name</label>
                             <div class="valid-feedback mb-2">
@@ -19,7 +19,7 @@
                             </div>
                         </div>
                         <div class="form-floating">
-                            <input class="form-control" type="email" id="email" name="email"
+                            <input class="form-control middle-input" type="email" id="email" name="email"
                                    placeholder="Email address" required>
                             <label class="form-label" for="email">Email address</label>
                             <div class="valid-feedback mb-2">
@@ -27,7 +27,8 @@
                             </div>
                         </div>
                         <div class="form-floating">
-                            <textarea class="form-control" id="message" name="message" placeholder="Message"
+                            <textarea class="form-control bottom-input user-textarea" id="message" name="message"
+                                      placeholder="Message"
                                       required></textarea>
                             <label class="form-label" for="message">Message</label>
                             <div class="valid-feedback mb-2">

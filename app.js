@@ -1,33 +1,33 @@
-if (process.env.NODE_ENV !== 'production') {
+if(process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 
-const express = require('express');
-const path = require('path');
-const mongoose = require('mongoose');
-const methodOverride = require('method-override');
-const engine = require('ejs-mate');
-const ExpressError = require('./utils/ExpressError');
-const session = require('express-session');
-const flash = require('connect-flash');
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
-const User = require('./models/user');
-const mongoSanitize = require('express-mongo-sanitize');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-// const redis = require('redis');
-// const redisStore = require('connect-redis')(session);
-const {RedisSessionStore: redisStore, redisClient} = require('./redis');
-const {transporter, contactMail} = require('./utils/mailTransport');
-const catchAsync = require('./utils/catchAsync');
-// const Campground = require('./models/campground');
-// const Review = require('./models/review');
-// const {campgroundSchema, reviewSchema} = require('./schemas');
+const express = require('express')
+    , path = require('path')
+    , mongoose = require('mongoose')
+    , {RedisSessionStore: redisStore, redisClient} = require('./redis')
+    , engine = require('ejs-mate')
+    , methodOverride = require('method-override')
+    , session = require('express-session')
+    , flash = require('connect-flash')
+    , passport = require('passport')
+    , LocalStrategy = require('passport-local')
+    , User = require('./models/user')
+    , mongoSanitize = require('express-mongo-sanitize')
+    , helmet = require('helmet')
+    , cookieParser = require('cookie-parser');
 
-const campgroundRoutes = require('./routes/campgrounds');
-const reviewRoutes = require('./routes/reviews');
-const userRoutes = require('./routes/users');
+const campgroundRoutes = require('./routes/campgrounds')
+    , reviewRoutes = require('./routes/reviews')
+    , userRoutes = require('./routes/users')
+    , contactRoutes = require('./routes/contacts');
+
+const {
+    scriptSrcUrls,
+    styleSrcUrls,
+    connectSrcUrls,
+    fontSrcUrls
+} = require('./allowedUrls');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -44,10 +44,10 @@ db.once('open', () => {
 
 redisClient.on('error', (err) => {
     console.log('Redis error: ', err);
-})
-redisClient.on('connect', (err) => {
+});
+redisClient.on('connect', () => {
     console.log('Connected to Redis session');
-})
+});
 
 const app = express();
 
@@ -77,31 +77,7 @@ app.use(session(sessionConfig));
 app.use(flash());
 app.use(helmet());
 
-const scriptSrcUrls = [
-    "https://code.jquery.com/",
-    "https://stackpath.bootstrapcdn.com/",
-    "https://api.tiles.mapbox.com/",
-    "https://api.mapbox.com/",
-    "https://kit.fontawesome.com/",
-    "https://cdnjs.cloudflare.com/",
-    "https://cdn.jsdelivr.net",
-];
-const styleSrcUrls = [
-    "https://cdn.jsdelivr.net",
-    "https://kit-free.fontawesome.com/",
-    "https://stackpath.bootstrapcdn.com/",
-    "https://api.mapbox.com/",
-    "https://api.tiles.mapbox.com/",
-    "https://fonts.googleapis.com/",
-    "https://use.fontawesome.com/",
-];
-const connectSrcUrls = [
-    "https://api.mapbox.com/",
-    "https://a.tiles.mapbox.com/",
-    "https://b.tiles.mapbox.com/",
-    "https://events.mapbox.com/",
-];
-const fontSrcUrls = [];
+
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
@@ -123,16 +99,16 @@ app.use(
     })
 );
 
-
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
-
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+    if(req.path !== '/login' && req.session.returnTo)
+        delete req.session.returnTo;
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
@@ -142,30 +118,23 @@ app.use((req, res, next) => {
 app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
 app.use('/campgrounds/:id/reviews', reviewRoutes);
+app.use('/contact', contactRoutes);
 
 app.get('/', (req, res) => {
     res.render('home');
 })
 
-app.get('/contact', (req, res) => {
-    res.render('contact');
-})
-
-app.post('/contact', catchAsync(async (req, res) => {
-    const {name, email, message} = req.body;
-    await transporter.sendMail(contactMail(name, email, message));
-    req.flash('success', 'A contact message has been sent! Please await for our response');
-    res.redirect('/campgrounds');
-}))
-
-app.all('*', (req, res, next) => {
-    next(new ExpressError('Page Not Found', 404));
+app.all('*', (req, res) => {
+    res.status(404).render('notFound');
 })
 
 app.use((err, req, res, next) => {
-    const {statusCode = 500} = err;
-    if (!err.message) err.message = 'Oh no! Something went wrong';
-    res.status(statusCode).render('error', {err});
+    const {statusCode = 500} = err
+        , redirectPath = err.redirectPath || 'back';
+    if(!err.message)
+        err.message = 'Oh no! Something went wrong';
+    req.flash('error', err.message);
+    res.status(statusCode).redirect(redirectPath);
 })
 
 app.listen(3000, () => {

@@ -1,5 +1,4 @@
 <%- layout('layouts/boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="/css/app.css">') %>
 <% block('head').append('<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>') %>
 <% block('head').append('<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css">') %>
 <% block('head').append('<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>') %>
@@ -11,7 +10,7 @@
     <% for(let campground of campgrounds.docs){ %>
         <article class="card mb-3 mx-3 mx-md-0">
             <div class="row g-0">
-                <div class="col-md-5 col-lg-4">
+                <div class="col-md-4 col-lg-3">
                     <% if(campground.images.length){ %>
                         <img src="<%= campground.images[0].square %>" alt="" class="img-fluid">
                     <% } else { %>
@@ -19,8 +18,8 @@
                              alt="" class="img-fluid">
                     <% } %>
                 </div>
-                <div class="col-md-7 col-lg-8">
-                    <div class="card-body">
+                <div class="col-md-8 col-lg-9">
+                    <div class="card-body text-md-start text-center p-4">
                         <h5 class="card-title display-4 fs-3"><%= campground.title %></h5>
                         <p class="card-text"><%= campground.description.substr(0, 200) %>...</p>
                         <p class="card-text">

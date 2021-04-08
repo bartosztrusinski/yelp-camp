@@ -1,4 +1,5 @@
 mapboxgl.accessToken = mapToken;
+
 const map = new mapboxgl.Map({
     container: 'cluster-map',
     style: 'mapbox://styles/mapbox/light-v10',
@@ -7,10 +8,9 @@ const map = new mapboxgl.Map({
     minZoom: 1,
 });
 
-// map.scrollZoom.disable();
 map.doubleClickZoom.disable();
 
-map.on('load', function () {
+map.on('load', function() {
     map.addControl(
         new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
@@ -25,7 +25,6 @@ map.on('load', function () {
         clusterMaxZoom: 14,
         clusterRadius: 50
     });
-
     map.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -52,7 +51,6 @@ map.on('load', function () {
             ]
         }
     });
-
     map.addLayer({
         id: 'cluster-count',
         type: 'symbol',
@@ -64,7 +62,6 @@ map.on('load', function () {
             'text-size': 12
         }
     });
-
     map.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -76,17 +73,15 @@ map.on('load', function () {
         }
     });
 
-
-    map.on('click', 'clusters', function (e) {
+    map.on('click', 'clusters', function(e) {
         const features = map.queryRenderedFeatures(e.point, {
             layers: ['clusters']
         });
         const clusterId = features[0].properties.cluster_id;
         map.getSource('campgrounds').getClusterExpansionZoom(
             clusterId,
-            function (err, zoom) {
-                if (err) return;
-
+            function(err, zoom) {
+                if(err) return;
                 map.easeTo({
                     center: features[0].geometry.coordinates,
                     zoom: zoom
@@ -95,14 +90,12 @@ map.on('load', function () {
         );
     });
 
-    map.on('click', 'unclustered-point', function (e) {
+    map.on('click', 'unclustered-point', function(e) {
         const {popUpMarkup} = e.features[0].properties;
         const coordinates = e.features[0].geometry.coordinates.slice();
-
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        while(Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
-
         new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: true,
@@ -114,17 +107,17 @@ map.on('load', function () {
             .addTo(map);
     });
 
-    map.on('mouseenter', 'unclustered-point', function () {
+    map.on('mouseenter', 'unclustered-point', function() {
         map.getCanvas().style.cursor = 'pointer';
     });
-    map.on('mouseleave', 'unclustered-point', function () {
+    map.on('mouseleave', 'unclustered-point', function() {
         map.getCanvas().style.cursor = '';
     });
 
-    map.on('mouseenter', 'clusters', function () {
+    map.on('mouseenter', 'clusters', function() {
         map.getCanvas().style.cursor = 'pointer';
     });
-    map.on('mouseleave', 'clusters', function () {
+    map.on('mouseleave', 'clusters', function() {
         map.getCanvas().style.cursor = '';
     });
 });

@@ -1,4 +1,5 @@
 mapboxgl.accessToken = mapToken;
+
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/outdoors-v11',
@@ -6,13 +7,13 @@ const map = new mapboxgl.Map({
     zoom: 10
 });
 
-
 map.addControl(new mapboxgl.NavigationControl());
 
 const marker = document.createElement('div');
-marker.style.backgroundImage = 'url("https://res.cloudinary.com/bartoszt/image/upload/w_40,h_40/v1615597373/camp_marker_3.png")';
 marker.style.width = '40px';
 marker.style.height = '40px';
+marker.style.backgroundImage =
+    'url("https://res.cloudinary.com/bartoszt/image/upload/w_40,h_40/v1615597373/camp_marker_3.png")';
 
 new mapboxgl.Marker(marker)
     .setLngLat(campground.geometry.coordinates)
@@ -24,8 +25,6 @@ new mapboxgl.Marker(marker)
             closeOnMove: true,
             className: 'rounded-3 text-center'
         })
-            .setHTML(
-                `<strong class="text-success fs-6">${campground.title}</strong><p>${campground.location}</p>`
-            )
+            .setHTML(`<strong class="text-success fs-6">${campground.title}</strong><p>${campground.location}</p>`)
     )
-    .addTo(map)
+    .addTo(map);

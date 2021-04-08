@@ -1,5 +1,5 @@
 <%- layout('layouts/boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="/css/delete-checkbox.css">') %>
+<% block('head').append('<link rel="stylesheet" href="/css/form-delete-image.css">') %>
 
 <div class="container my-5">
     <div class="row">
@@ -53,12 +53,14 @@
                             <input class="form-control" type="file" id="image" name="image" multiple>
                         </div>
                         <div class="mb-3 row">
-                            <p class="lead mb-2">Delete Images</p>
+                            <% if(campground.images.length){ %>
+                                <p class="lead mb-2">Delete Images</p>
+                            <% } %>
                             <% for(let [i, image] of campground.images.entries()){ %>
                                 <div class="col-md-<%= 12 / campground.images.length %> d-flex flex-column align-items-center mb-3">
-                                    <div class="position-relative">
+                                    <div class="delete-image-animate">
                                         <img src="<%= image.thumbnail %>" alt="" class="rounded img-fluid">
-                                        <label class="custom-label" for="image-<%= i %>">
+                                        <label class="delete-image-label" for="image-<%= i %>">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-trash-fill"
                                                  viewBox="0 0 16 16">
                                                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
@@ -66,17 +68,25 @@
                                         </label>
                                     </div>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="image-<%= i %>"
+                                        <input class="form-check-input delete-image-checkbox" type="checkbox"
+                                               id="image-<%= i %>"
                                                name="deleteImages[]" value="<%= image.filename %>">
                                     </div>
                                 </div>
                             <% } %>
                         </div>
-                        <div class="mb-3">
-                            <button class="btn btn-info">Update Campground</button>
+                        <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-center">
+                            <a class="btn btn-outline-primary mb-3"
+                               href="/campgrounds/<%= campground._id %>">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                                </svg>
+                                <span class="align-middle">Back To Campground</span>
+                            </a>
+                            <button class="btn btn-outline-success mb-3">Update Campground</button>
                         </div>
                     </form>
-                    <a href="/campgrounds/<%= campground._id %>">Back To Campground</a>
                 </div>
             </div>
         </div>

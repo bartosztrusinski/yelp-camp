@@ -1,71 +1,26 @@
-#cluster-map {
+#cluster-map{
     width: 100%;
     height: 50vh;
 }
 
-#map {
+#map{
     width: 100%;
     height: 300px;
 }
 
-
-.user-form #username, .user-form #name, .user-form #newPassword {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+#profile-thumbnail{
+    width: 35px;
+    height: 35px;
 }
 
-.user-form #email {
-    border-radius: 0;
-    margin-bottom: -1px;
+#passwordHelp{
+    font-size: 0.78rem;
 }
 
-.user-form #retypePassword {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+.dropdown-toggle:after{
+    vertical-align: middle;
 }
 
-.user-form #phoneNumber {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.user-form #phonePrefix {
-    border-top-left-radius: 0;
-}
-
-.user-form #password {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    margin-bottom: -1px;
-}
-
-.user-form #message {
-    height: 150px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-
-.user-form #bio {
-    height: 150px;
-    border-radius: 0;
-    margin-bottom: -1px;
-}
-
-.user-form #rememberMe, .user-form #showEmail, .user-form #deletePicture {
-    cursor: pointer;
-    border-color: #198754;
-}
-
-.user-form #rememberMe:checked, .user-form #showEmail:checked, .user-form #deletePicture:checked {
+.dropdown-menu-dark .dropdown-item:active{
     background-color: #198754;
-}
-
-.user-form #rememberMe:focus, .user-form #showEmail:focus, .user-form #deletePicture:focus {
-    box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
-}
-
-.user-form #rememberMe + label, .user-form #showEmail + label, .user-form #deletePicture + label {
-    color: inherit;
 }

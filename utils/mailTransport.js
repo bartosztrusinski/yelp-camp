@@ -1,6 +1,18 @@
 const nodemailer = require('nodemailer');
 
-module.exports.transporter = nodemailer.createTransport({
+module.exports.sendVerificationMail = async(user, token) => {
+    await transporter.sendMail(verificationMail(user, token));
+}
+
+module.exports.sendPasswordMail = async(user, token) => {
+    await transporter.sendMail(passwordMail(user, token));
+}
+
+module.exports.sendContactMail = async(name, email, message) => {
+    await transporter.sendMail(contactMail(name, email, message));
+}
+
+const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
@@ -10,28 +22,29 @@ module.exports.transporter = nodemailer.createTransport({
     },
 });
 
-module.exports.verificationMail = function (user, token, host) {
+const verificationMail = (user, token) => {
     return {
         from: '"Yelp Camp 🏕" <yelp@camp.com>',
         to: user.email.address,
         subject: "Yelp Camp - Verify Account",
         text: 'Hello ' + user.username + ',\n\n' +
-            'Please verify your account by clicking the link: ' +
-            '\nhttp:\/\/' + host + '\/verify\/' + token + '\n\nThank You!\n',
+            'Please verify your account by clicking the link: \n' +
+            'http://localhost:3000/verify/' + token + '\n\n' +
+            'Thank You!\n',
         html: `<h1>Hello, ${user.username}!</h1>
                 <p>Please verify your account by clicking the link below. Thank You!</p>
                 <a href='http://localhost:3000/verify/${token}'>Click here to verify!</a>`,
     }
 }
 
-module.exports.passwordMail = function (user, token, host) {
+const passwordMail = (user, token) => {
     return {
         from: '"Yelp Camp 🏕" <yelp@camp.com>',
         to: user.email.address,
         subject: "Yelp Camp - Reset Password",
         text: 'Hello ' + user.username + ',\n\n' +
-            'Please reset your password by clicking the link: ' +
-            '\nhttp:\/\/' + host + '\/reset\/' + token + '?id=' + user._id + '\n\n' +
+            'Please reset your password by clicking the link: \n' +
+            'http://localhost:3000/reset/' + token + '?id=' + user._id + '\n\n' +
             'Thank You!\n',
         html: `<h1>Hello, ${user.username}!</h1>
                 <p>Please reset your password by clicking the link below. Thank You!</p>
@@ -39,7 +52,7 @@ module.exports.passwordMail = function (user, token, host) {
     }
 }
 
-module.exports.contactMail = function (name, email, message) {
+const contactMail = (name, email, message) => {
     return {
         from: '"Yelp Camp 🏕" <yelp@camp.com>',
         to: process.env.EMAIL_ADDRESS,

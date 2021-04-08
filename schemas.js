@@ -1,5 +1,5 @@
-const BaseJoi = require('joi');
-const sanitizeHtml = require('sanitize-html');
+const BaseJoi = require('joi')
+    , sanitizeHtml = require('sanitize-html');
 
 const extension = (joi) => ({
     type: 'string',
@@ -14,7 +14,8 @@ const extension = (joi) => ({
                     allowedTags: [],
                     allowedAttributes: {},
                 });
-                if (clean !== value) return helpers.error('string.escapeHTML', {value})
+                if(clean !== value)
+                    return helpers.error('string.escapeHTML', {value});
                 return clean;
             }
         }
@@ -55,7 +56,7 @@ module.exports.campgroundSchema = Joi.object({
 
     }).required(),
     deleteImages: Joi.array().max(3)
-})
+});
 
 module.exports.reviewSchema = Joi.object({
     review: Joi.object({
@@ -69,7 +70,7 @@ module.exports.reviewSchema = Joi.object({
             .min(1)
             .max(5)
     }).required()
-})
+});
 
 module.exports.userSchema = Joi.object({
     email: Joi.object({
@@ -86,9 +87,17 @@ module.exports.userSchema = Joi.object({
     password: Joi.string()
         .required()
         .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}'))
+        .messages({
+            'string.pattern.base': 'Password should be at least 8 characters long, contain at least one lowercase and uppercase letter and one digit'
+        })
         .escapeHTML(),
-    retypePassword: Joi.ref('password')
-})
+    retypePassword: Joi.string()
+        .valid(Joi.ref('password'))
+        .messages({
+            'any.only': 'Password fields need to match!'
+        })
+
+});
 
 module.exports.userProfileSchema = Joi.object({
     name: Joi.string()
@@ -112,11 +121,19 @@ module.exports.userProfileSchema = Joi.object({
         filename: Joi.string()
             .required()
     })
-})
+});
 
 module.exports.passwordSchema = Joi.object({
     password: Joi.string()
         .required()
         .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}'))
-        .escapeHTML()
-})
+        .messages({
+            'string.pattern.base': 'Password must contain at least one uppercase letter, one lowercase letter, a number and must be at least 8 characters'
+        })
+        .escapeHTML(),
+    retypePassword: Joi.string()
+        .valid(Joi.ref('password'))
+        .messages({
+            'any.only': 'Password fields need to match!'
+        })
+});

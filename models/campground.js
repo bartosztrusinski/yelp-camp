@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
-const Review = require('./review');
-const Schema = mongoose.Schema;
-const {cloudinary} = require('../cloudinary');
-const format = require('date-fns/format');
-const mongoosePaginate = require('mongoose-paginate-v2');
+const mongoose = require('mongoose')
+    , Schema = mongoose.Schema
+    , Review = require('./review')
+    , {cloudinary} = require('../cloudinary')
+    , format = require('date-fns/format')
+    , mongoosePaginate = require('mongoose-paginate-v2');
 
+const options = {toJSON: {virtuals: true}};
 
-const opts = {toJSON: {virtuals: true}};
 const imageSchema = new Schema({
     url: {
         type: String,
@@ -16,15 +16,15 @@ const imageSchema = new Schema({
         type: String,
         required: true
     }
-}, opts)
+}, options);
 
-imageSchema.virtual('thumbnail').get(function () {
-    return this.url.replace('/upload', '/upload/q_100,w_200,ar_1:1,c_fill,g_center,x_0,y_0')
-})
+imageSchema.virtual('thumbnail').get(function() {
+    return this.url.replace('/upload', '/upload/q_100,w_200,ar_1:1,c_fill,g_center,x_0,y_0');
+});
 
-imageSchema.virtual('square').get(function () {
-    return this.url.replace('/upload', '/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0')
-})
+imageSchema.virtual('square').get(function() {
+    return this.url.replace('/upload', '/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0');
+});
 
 
 const campgroundSchema = new Schema({
@@ -79,31 +79,34 @@ const campgroundSchema = new Schema({
             ref: 'Review'
         }
     ]
-}, opts);
+}, options);
 
-campgroundSchema.virtual('properties.popUpMarkup').get(function () {
-    return `<strong>${this.title}</strong><br><a href="/campgrounds/${this._id}" class="text-decoration-none badge bg-success text-white text-wrap text-uppercase">Show Camp</a>`
-})
+campgroundSchema.virtual('properties.popUpMarkup').get(function() {
+    return `<strong>${this.title}</strong><br><a href="/campgrounds/${this._id}"
+            class="text-decoration-none badge bg-success text-white text-wrap text-uppercase">Show Camp</a>`;
+});
 
-campgroundSchema.virtual('dateFormatted').get(function () {
+campgroundSchema.virtual('dateFormatted').get(function() {
     return format(this.dateCreated, "dd-MM-yyyy");
-})
+});
 
-campgroundSchema.post('findOneAndDelete', async function (doc) {
-    if (doc) {
+campgroundSchema.virtual('priceFormatted').get(function() {
+    return Math.round((this.price + Number.EPSILON) * 100) / 100;
+});
+
+campgroundSchema.post('remove', async function(doc) {
+    if(doc) {
         await Review.deleteMany({
             _id: {
                 $in: doc.reviews
             }
-        })
-        for (let image of doc.images) {
-            await cloudinary.uploader.destroy(image.filename)
+        });
+        for(let image of doc.images) {
+            await cloudinary.uploader.destroy(image.filename);
         }
     }
-})
+});
 
 campgroundSchema.plugin(mongoosePaginate);
-
 const Campground = mongoose.model('Campground', campgroundSchema);
-
 module.exports = Campground;

@@ -3,7 +3,7 @@
 <div class="container my-5">
     <div class="row">
         <h1 class="text-center mb-4">New Campground</h1>
-        <div class="col-md-6 offset-md-3">
+        <div class="col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
             <div class="card shadow rounded-3">
                 <div class="card-body">
                     <form action="/campgrounds" method="POST" novalidate class="validated-form"
@@ -45,13 +45,24 @@
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label lead">Upload Images</label>
-                            <input class="form-control" type="file" id="image" name="image" multiple>
+                            <input class="form-control" type="file" id="image" name="image"
+                                   aria-describedby="imageUploadInfo" multiple>
+                            <div id="imageUploadInfo" class="form-text">
+                                You can upload up to 3 images.
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <button class="btn btn-success">Add Campground</button>
+                        <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-center">
+                            <a class="btn btn-outline-primary mb-3"
+                               href="/campgrounds">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                                </svg>
+                                <span class="align-middle">Back To Campgrounds</span>
+                            </a>
+                            <button class="btn btn-outline-success mb-3">Add Campground</button>
                         </div>
                     </form>
-                    <a href="/campgrounds">All Campgrounds</a>
                 </div>
             </div>
         </div>

@@ -1,5 +1,4 @@
 <%- layout('layouts/boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="/css/app.css">') %>
 <% block('head').append('<link rel="stylesheet" href="/css/stars.css">') %>
 <% block('head').append('<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>') %>
 <% block('head').append('<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css">') %>
@@ -45,7 +44,7 @@
                         <span class="px-1"><strong>Created:</strong> <%= campground.dateFormatted %></span>
                     </li>
                     <li class="list-group-item py-3">
-                        <strong>Price:</strong> $<%= campground.price %>/night
+                        <strong>Price:</strong> $<%= campground.priceFormatted %>/night
                     </li>
                     <li class="list-group-item d-flex flex-column flex-lg-row justify-content-between align-items-baseline py-3">
                         <div class="mb-1">
@@ -62,10 +61,35 @@
                             <div class="mb-1">
                                 <a href="/campgrounds/<%= campground._id %>/edit"
                                    class="card-link btn btn-info">Edit</a>
-                                <form class="d-inline" action="/campgrounds/<%= campground._id %>?_method=DELETE"
-                                      method="POST">
-                                    <button class="btn btn-danger">Delete</button>
-                                </form>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteCamp">
+                                    Delete
+                                </button>
+                                <div class="modal fade" id="deleteCamp" tabindex="-1" aria-labelledby="deleteCamp"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteCamp">Delete Campground</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete the campground?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline-secondary"
+                                                        data-bs-dismiss="modal">Close
+                                                </button>
+                                                <form class="d-inline"
+                                                      action="/campgrounds/<%= campground._id %>?_method=DELETE"
+                                                      method="POST">
+                                                    <button class="btn btn-outline-danger">Delete Campground</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         <% } %>
                     </li>
@@ -139,10 +163,35 @@
                             <div class="m-2"><%= review.body %></div>
                             <% if(currentUser && (currentUser.equals(review.author) || currentUser.isAdmin)){ %>
                                 <div>
-                                    <form action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"
-                                          method="POST">
-                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteReview<%= review._id %>">
+                                        Delete
+                                    </button>
+                                    <div class="modal fade" id="deleteReview<%= review._id %>" tabindex="-1"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Delete Review</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete the review?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-outline-secondary"
+                                                            data-bs-dismiss="modal">Close
+                                                    </button>
+                                                    <form action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                                          method="POST">
+                                                        <button class="btn btn-outline-danger">Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             <% } %>
                         </li>

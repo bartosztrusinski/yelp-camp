@@ -1,6 +1,11 @@
+const {deleteUploadedImages} = require('../cloudinary');
+
 const catchAsync = (fn) => {
     return (req, res, next) => {
-        fn(req, res, next).catch(next); // same as catch(e => next(e))
+        fn(req, res, next).catch(e => {
+            deleteUploadedImages(req);
+            next(e);
+        });
     }
 }
 

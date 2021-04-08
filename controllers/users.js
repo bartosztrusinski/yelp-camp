@@ -1,39 +1,31 @@
-const User = require('../models/user');
-const {VerificationToken, PasswordToken} = require('../models/token');
-const ExpressError = require('../utils/ExpressError');
-const {transporter, verificationMail, passwordMail} = require('../utils/mailTransport');
-const bcrypt = require('bcrypt')
+const User = require('../models/user')
+    , {VerificationToken, PasswordToken} = require('../models/token')
+    , ExpressError = require('../utils/ExpressError')
+    , {sendVerificationMail, sendPasswordMail} = require('../utils/mailTransport')
+    , bcrypt = require('bcrypt')
+    , {cloudinary} = require('../cloudinary');
 
-module.exports.renderRegister = (req, res) => {
-    res.render('users/register');
-}
 
-module.exports.register = async (req, res) => {
-    const {username, email, password, retypePassword} = req.body;
-    if (password !== retypePassword) throw new ExpressError('The Password Fields Must Match!', 400);
-    const user = new User({email, username});
-    const registeredUser = await User.register(user, password);
-    await VerificationToken.findOneAndDelete({_id: registeredUser._id})
-    const newToken = new VerificationToken({_id: registeredUser._id});
-    const savedToken = await newToken.save();
-    await transporter.sendMail(verificationMail(registeredUser, savedToken.token, req.headers.host))
-    req.flash('success', `A verification email has been sent to ${registeredUser.email.address}. It will be expire after one day. 
-                                If you did not get verification email, click <a href='/resend'>here</a> to resend token!`)
-    res.redirect('/campgrounds');
-}
-
-module.exports.renderLogin = (req, res) => {
-    res.render('users/login');
-}
-
-module.exports.login = async (req, res) => {
-    // const redirectUrl = req.session.returnTo || '/campgrounds';
-    // delete req.session.returnTo;
-    req.brute.reset(function () {
+module.exports.login = async(req, res) => {
+    const redirectUrl = getPathToReturnTo(req);
+    setSessionAge(req);
+    req.brute.reset(function() {
         req.flash('success', 'Welcome back!');
-        // res.redirect(redirectUrl);
-        res.redirect('/campgrounds');
+        res.redirect(redirectUrl);
     });
+}
+
+const getPathToReturnTo = (req) => {
+    const redirectUrl = req.session.returnTo || '/campgrounds';
+    delete req.session.returnTo;
+    return redirectUrl;
+}
+
+const setSessionAge = (req) => {
+    const month = 1000 * 60 * 60 * 24 * 30;
+    const halfHour = 1000 * 60 * 30;
+    const isRememberMeChecked = req.body.remember_me;
+    req.session.cookie.maxAge = isRememberMeChecked ? month : halfHour;
 }
 
 module.exports.logout = (req, res) => {
@@ -42,39 +34,155 @@ module.exports.logout = (req, res) => {
     res.redirect('back');
 }
 
-module.exports.renderResendForm = (req, res) => {
+module.exports.register = async(req, res) => {
+    const {username, email, password} = req.body
+        , newUser = new User({email, username})
+        , registeredUser = await User.register(newUser, password)
+        , token = await issueNewVerificationToken(registeredUser._id);
+    await sendVerificationMail(registeredUser, token);
+    req.flash('success',
+        `A verification email has been sent to ${registeredUser.email.address}. It will be expire after one day. 
+        If you did not get verification email, click <a href='/resend'>here</a> to resend token!`);
+    res.redirect('/campgrounds');
+}
+
+module.exports.sendVerifyMail = async(req, res) => {
+    const {email} = req.body
+        , user = await User.findOne({'email.address': email});
+    if(user) {
+        if(user.isActive)
+            throw new ExpressError('This account has been already verified. Please log in.', 400, '/login');
+        const token = await issueNewVerificationToken(user._id);
+        await sendVerificationMail(user, token);
+    }
+    req.flash('success', `A verification email has been sent to ${email}. It will be expire after one hour. 
+                                If you did not get the email, click <a href='/resend'>here</a> to resend token!`);
+    res.redirect('/campgrounds');
+}
+
+const issueNewVerificationToken = async(userID) => {
+    await VerificationToken.findOneAndDelete({_id: userID});
+    const newToken = new VerificationToken({_id: userID});
+    const savedToken = await newToken.save();
+    return savedToken.token;
+}
+
+module.exports.sendPasswordMail = async(req, res) => {
+    const {email} = req.body
+        , user = await User.findOne({'email.address': email});
+    if(user) {
+        const token = await issueNewPasswordToken(user._id);
+        await sendPasswordMail(user, token);
+    }
+    req.flash('success', `A password reset email has been sent to ${email}. It will be expire after one hour.
+                            If you did not get the email, click <a href='/forgot'>here</a> to resend token!`);
+    res.redirect('/campgrounds');
+}
+
+const issueNewPasswordToken = async(userID) => {
+    await PasswordToken.findOneAndDelete({_id: userID});
+    const newToken = new PasswordToken({_id: userID});
+    const token = newToken.token;
+    newToken.token = await bcrypt.hash(newToken.token, 12);
+    await newToken.save();
+    return token;
+}
+
+module.exports.verifyUser = async(req, res) => {
+    const {token} = req.params
+        , deletedToken = await VerificationToken.findOneAndDelete({token})
+        , user = await User.findById(deletedToken._id);
+    user.isActive = true;
+    await user.save();
+    req.flash('success', 'Successfully Verified Your Account!');
+    res.redirect('/login');
+}
+
+module.exports.resetPassword = async(req, res) => {
+    const {id} = req.query
+        , user = await User.findById(id);
+    await user.setPassword(req.body.password);
+    await user.save();
+    await PasswordToken.findByIdAndDelete(id);
+    req.flash('success', 'Successfully Changed Your Password!');
+    res.redirect('/login');
+}
+
+module.exports.updateUserProfile = async(req, res) => {
+    const {name, bio, showEmail, phoneNumber} = req.body
+        , user = res.locals.user
+        , isPublic = showEmail === 'yes';
+    await user.updateOne({name, bio, phoneNumber, 'email.public': isPublic});
+    if(req.body.deletePicture === 'yes') {
+        await updateProfilePictureTo(null, user);
+    } else if(req.file) {
+        const profilePicture = {url: req.file.path, filename: req.file.filename};
+        await updateProfilePictureTo(profilePicture, user);
+    }
+    req.flash('success', 'Successfully updated profile!');
+    res.redirect(`/users/${user._id}`);
+}
+
+const updateProfilePictureTo = async(picture, user) => {
+    if(user.profilePicture)
+        await cloudinary.uploader.destroy(user.profilePicture.filename);
+    user.profilePicture = picture;
+    await user.save();
+}
+
+module.exports.changePassword = async(req, res) => {
+    const user = res.locals.user;
+    await user.setPassword(req.body.password);
+    await user.save();
+    req.flash('success', 'Successfully Changed Your Password!');
+    res.redirect(`/users/${user._id}`);
+}
+
+module.exports.deleteUser = async(req, res) => {
+    const user = res.locals.user;
+    await user.remove();
+    req.flash('success', 'Successfully deleted user!');
+    res.redirect('/campgrounds');
+}
+
+
+module.exports.renderLogin = (req, res) => {
+    res.render('users/login');
+}
+
+module.exports.renderRegister = (req, res) => {
+    res.render('users/register');
+}
+
+module.exports.renderUserProfile = async(req, res) => {
+    const user = await res.locals.user
+        .populate({
+            path: 'campgrounds',
+            options: {
+                sort: {'dateCreated': -1}
+            }
+        })
+        .execPopulate();
+    res.render('users/show', {user});
+}
+
+module.exports.renderEditForm = async(req, res) => {
+    const user = res.locals.user;
+    res.render('users/edit', {user});
+}
+
+module.exports.renderPasswordChangeForm = (req, res) => {
+    const {id} = req.params;
+    res.render('users/changePassword', {id});
+}
+
+module.exports.renderVerifyForm = (req, res) => {
     res.render('users/sendToken', {
         title: 'Verify Account',
         description: 'We will resend you an email with instructions on how to verify your account',
         action: '/resend'
     });
 }
-
-module.exports.sendVerifyMail = async (req, res) => {
-    const foundUser = await User.findOne({'email.address': req.body.email})
-    if (!foundUser) throw new ExpressError('Could not find that email!', 400);
-    if (foundUser.isActive) throw new ExpressError('This account has been already verified. Please log in.', 400);
-    await VerificationToken.findOneAndDelete({_id: foundUser._id})
-    const newToken = new VerificationToken({_id: foundUser._id})
-    const savedToken = await newToken.save();
-    await transporter.sendMail(verificationMail(foundUser, savedToken.token, req.headers.host))
-    req.flash('success', `A verification email has been sent to ${foundUser.email.address}. It will be expire after one hour. 
-                                If you did not get the email, click <a href='/resend'>here</a> to resend token!`)
-    res.redirect('/campgrounds');
-}
-
-module.exports.verifyUser = async (req, res) => {
-    const {token} = req.params;
-    const foundToken = await VerificationToken.findOneAndDelete({token: token});
-    if (!foundToken) throw new ExpressError('Verification token expired!', 400);
-    const foundUser = await User.findOne({_id: foundToken._id});
-    if (!foundUser) throw new ExpressError('Could not find that user!', 400);
-    foundUser.isActive = true;
-    await foundUser.save();
-    req.flash('success', 'Successfully Verified Your Account!');
-    res.redirect('/login');
-}
-
 
 module.exports.renderForgotForm = (req, res) => {
     res.render('users/sendToken', {
@@ -84,89 +192,8 @@ module.exports.renderForgotForm = (req, res) => {
     });
 }
 
-module.exports.sendPasswordMail = async (req, res) => {
-    const foundUser = await User.findOne({'email.address': req.body.email})
-    if (!foundUser) throw new ExpressError('Could not find that email!', 400);
-    if (!foundUser.isActive) throw new ExpressError('This account needs to be verified first.', 400);
-    await PasswordToken.findOneAndDelete({_id: foundUser._id})
-    const newToken = new PasswordToken({_id: foundUser._id})
-    const token = newToken.token;
-    newToken.token = await bcrypt.hash(newToken.token, 12);
-    await newToken.save();
-    await transporter.sendMail(passwordMail(foundUser, token, req.headers.host))
-    req.flash('success', `A password reset email has been sent to ${foundUser.email.address}. It will be expire after one hour.
-                            If you did not get the email, click <a href='/forgot'>here</a> to resend token!`)
-    res.redirect('/campgrounds');
-}
-
 module.exports.renderResetForm = (req, res) => {
     const {token} = req.params;
     const {id} = req.query;
     res.render('users/reset', {token, id});
-}
-
-module.exports.resetPassword = async (req, res) => {
-    const {token} = req.params;
-    const {id} = req.query;
-    if (req.body.password !== req.body.retypePassword) throw new ExpressError('The Password Fields Must Match!', 400);
-    const foundToken = await PasswordToken.findById(id);
-    if (!foundToken) throw new ExpressError('Reset token expired!', 400);
-    const isValid = bcrypt.compare(token, foundToken.token);
-    if (!isValid) throw new ExpressError("Invalid or expired password reset token", 400);
-    const foundUser = await User.findById(id);
-    if (!foundUser) throw new ExpressError('Could not find that user!', 400);
-    await foundUser.setPassword(req.body.password);
-    await foundUser.save();
-    await PasswordToken.findByIdAndDelete(foundToken._id);
-    req.flash('success', 'Successfully Changed Your Password!');
-    res.redirect('/login');
-}
-
-module.exports.renderUserProfile = async (req, res) => {
-    const {id} = req.params;
-    const foundUser = await User.findById(id).populate({path: 'campgrounds', options: {sort: {'dateCreated': -1}}});
-    res.render('users/show', {user: foundUser});
-}
-
-module.exports.renderEditForm = async (req, res) => {
-    const {id} = req.params;
-    const userToEdit = await User.findById(id);
-    res.render('users/edit', {user: userToEdit});
-}
-
-module.exports.updateUserProfile = async (req, res) => {
-    const {id} = req.params;
-    const {name, bio, showEmail, phoneNumber} = req.body;
-    const userToUpdate = await User.findByIdAndUpdate(id, {name, bio, phoneNumber})
-    userToUpdate.email.public = showEmail === 'yes';
-    await userToUpdate.save();
-    req.flash('success', 'Successfully updated profile!');
-    res.redirect(`/users/${userToUpdate._id}`);
-}
-
-module.exports.deleteUser = async (req, res) => {
-    const {id} = req.params;
-    await User.findByIdAndDelete(id);
-    req.flash('success', 'Successfully deleted user!');
-    res.redirect('/campgrounds');
-}
-
-module.exports.renderPasswordChangeForm = (req, res) => {
-    const {id} = req.params;
-    res.render('users/changePassword', {id});
-}
-
-module.exports.changePassword = async (req, res) => {
-    const {id} = req.params;
-    const userToUpdate = await User.findById(id);
-    const match = await userToUpdate.authenticate(req.body.currentPassword);
-
-    if (!match.user) throw new ExpressError('The Given Password Is Incorrect!', 400);
-    if (req.body.password !== req.body.retypePassword) throw new ExpressError('The Password Fields Must Match!', 400);
-
-    await userToUpdate.setPassword(req.body.password);
-    await userToUpdate.save();
-
-    req.flash('success', 'Successfully Changed Your Password!');
-    res.redirect(`/users/${userToUpdate._id}`);
 }
