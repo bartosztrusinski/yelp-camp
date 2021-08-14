@@ -21,7 +21,7 @@
                 <div class="col-md-8 col-lg-9">
                     <div class="card-body text-md-start text-center p-4">
                         <h5 class="card-title display-4 fs-3"><%= campground.title %></h5>
-                        <p class="card-text"><%= campground.description.substr(0, 200) %>...</p>
+                        <p class="card-text"><%= campground.description.length > 200 ? campground.description.substr(0, 200) + "..." : campground.description %> </p>
                         <p class="card-text">
                             <small class="text-muted"><%= campground.location %></small>
                         </p>
@@ -47,6 +47,9 @@
     const campgrounds = {features: <%- JSON.stringify(allCampgrounds) %>}
 </script>
 <% block('footer').append('<script src="/js/clusterMap.js"></script>') %>
-<% block('footer').append('<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>') %>
+<% block('footer').append('<script 
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" 
+  crossorigin="anonymous"></script>') %>
 <% block('footer').append('<script src="/js/paginate.js"></script>') %>
 
