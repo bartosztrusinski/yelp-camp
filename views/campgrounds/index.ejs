@@ -24,7 +24,7 @@
                         <p class="card-text">
                           <% if(campground.description.length > 200){ %> 
                             <%= campground.description.substr(0, 200) %>...
-                          <% else { %>
+                          <% } else { %>
                             <%= campground.description %>
                           <% } %>
                         </p>
