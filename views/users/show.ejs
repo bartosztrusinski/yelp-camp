@@ -1,113 +1,147 @@
 <%- layout('layouts/boilerplate') %>
 
-<div class="container my-5">
-    <h2 class="display-4 mb-4 text-md-start text-center">User Profile</h2>
-    <div class="row">
-        <div class="col-sm-10 offset-sm-1 offset-md-0 col-md-6 col-xl-4">
-            <div class="card mb-3">
-                <% if(user.profilePicture){ %>
-                    <img src="<%= user.profilePicture.rounded %>"
-                         class="img-fluid d-block w-50 mx-auto pt-3" alt="profile picture">
-                <% } else { %>
-                    <img src="https://res.cloudinary.com/bartoszt/image/upload/c_fill,g_auto:face,r_max,w_500,ar_1:1/v1616588583/user_profile.png"
-                         class="img-fluid d-block w-50 mx-auto pt-3" alt="profile picture">
-                <% } %>
-                <div class="card-body text-center">
-                    <h1 class="card-title display-4 fs-2"><%= user.username %></h1>
-                    <% if(user.name){ %>
-                        <p class="card-text"><%= user.name %></p>
-                    <% } %>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <% if(user.email.public || user.phoneNumber){ %>
-                        <li class="list-group-item text-muted d-flex flex-column justify-content-between py-3">
-                            <% if(user.email.public){ %>
-                                <span><strong>Email:</strong> <%= user.email.address %></span>
-                            <% } %>
-                            <% if(user.phoneNumber){ %>
-                                <span><strong>Phone Number:</strong> +<%= user.phoneNumber %></span>
-                            <% } %>
-                        </li>
-                    <% } %>
-                    <% if(user.bio){ %>
-                        <li class="list-group-item py-3">
-                            <strong>Bio</strong>
-                            <div><%= user.bio %></div>
-                        </li>
-                    <% } else { %>
-                        <li class="list-group-item py-3">
-                            <i>No user bio</i>
-                        </li>
-                    <% } %>
-                    <% if(currentUser && (currentUser.equals(user) || currentUser.isAdmin)) { %>
-                        <li class="list-group-item d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center py-3">
-                            <a href="/users/<%= user._id %>/edit" class="btn btn-info m-1 flex-grow-1">Edit Profile</a>
-                            <a href="/users/<%= user._id %>/change-password" class="btn btn-warning m-1 flex-grow-1">Change
-                                Password</a>
-                            <button type="button" class="btn btn-danger m-1 flex-grow-1" data-bs-toggle="modal"
-                                    data-bs-target="#deleteUser">
-                                Delete User
-                            </button>
-                            <div class="modal fade" id="deleteUser" tabindex="-1" aria-labelledby="deleteUser"
-                                 aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteUser">Delete User</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Are you sure you want to delete your account permanently?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                    data-bs-dismiss="modal">
-                                                Close
-                                            </button>
-                                            <form action="/users/<%= user._id %>?_method=DELETE"
-                                                  method="POST">
-                                                <button class="btn btn-outline-danger">
-                                                    Delete Account
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    <% } %>
-                </ul>
-            </div>
+<div class="container-lg mb-5">
+  <h1 class="my-3 text-sm-start text-center">User Profile</h1>
+  <article class="row g-4">
+    <section class="col-sm-6 col-md-5 col-lg-4">
+      <div class="card mx-3 mx-sm-0">
+        <img
+          src="<%= user.profilePicture ? user.profilePicture.rounded : 
+          'https://res.cloudinary.com/bartoszt/image/upload/c_fill,g_auto:face,r_max,w_500,ar_1:1/v1616588583/user_profile.png'
+          %>"
+          class="card-img-top w-50 m-auto pt-2"
+          alt="<%= user.username %>'s picture" />
+        <div class="card-body text-center">
+          <h3 class="card-title fw-bolder"><%= user.username %></h3>
+          <% if(user.name){ %>
+            <p class="card-subtitle text-muted"><%= user.name %></p>
+          <% } %>
         </div>
-        <div class="col-sm-10 offset-sm-1 offset-md-0 col-md-6 col-xl-8">
-            <% if(user.campgrounds && user.campgrounds.length){ %>
-                <h2 class="fs-2 fw-light mb-4 text-md-start text-center">Campgrounds <%= user.username %>
-                    created</h2>
+
+        <ul class="list-group list-group-flush">
+          <% if(user.email.public){ %>
+            <li class="list-group-item">
+              <span>
+                <span class="badge bg-primary">Email</span>
+                <%= user.email.address %>
+              </span>
+            </li>
+          <% } %>
+          
+          <% if(user.phoneNumber){ %>
+            <li class="list-group-item">
+              <span>
+                <span class="badge bg-primary">Phone Number</span> 
+                +<%= user.phoneNumber %>
+              </span>
+            </li>
+          <% } %>
+
+          <li class="list-group-item">
+            <% if(user.bio){ %>
+              <span class="badge bg-primary">Bio</span>
+              <p class="d-inline"><%= user.bio %></p>
             <% } else { %>
-                <h2 class="fs-2 fw-light mb-4 text-md-start text-center">No campgrounds created</h2>
+              <span class="badge bg-primary">No user bio</span>
             <% } %>
-            <div class="row">
-                <% for(let campground of user.campgrounds){ %>
-                    <div class="col-lg-6 d-flex align-items-stretch">
-                        <div class="card mb-3">
-                            <% if(campground.images.length){ %>
-                                <img src="<%= campground.images[0].square %>" alt="" class="card-img-top">
-                            <% } else { %>
-                                <img src="https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png"
-                                     alt="" class="card-img-top">
-                            <% } %>
-                            <div class="card-body d-flex flex-column justify-content-between">
-                                <h5 class="card-title m-0"><%= campground.title %></h5>
-                                <p class="card-text mb-2">
-                                    <small class="text-muted"><%= campground.location %></small>
-                                </p>
-                                <a href="/campgrounds/<%= campground._id %>" class="btn btn-primary">View</a>
-                            </div>
-                        </div>
+          </li>
+        </ul>
+
+        <% if(currentUser && (currentUser.equals(user) || currentUser.isAdmin)){ %>
+          <div class="card-footer">
+            <div class="row g-2">
+              <a href="/users/<%= user._id %>/edit" class="btn btn-primary">
+                Edit Profile
+              </a>
+              <a
+                href="/users/<%= user._id %>/change-password"
+                class="btn btn-warning">
+                Change Password
+              </a>
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#delete-user">
+                Delete User
+              </button>
+              <div
+                class="modal fade"
+                id="delete-user"
+                tabindex="-1"
+                aria-labelledby="delete-user"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="delete-user">Delete User</h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                     </div>
-                <% } %>
+                    <div class="modal-body">
+                      Are you sure you want to delete your account permanently?
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                        Close
+                      </button>
+                      <form
+                        action="/users/<%= user._id %>?_method=DELETE"
+                        method="POST">
+                        <button class="btn btn-outline-danger">
+                          Delete Account
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
+          </div>
+        <% } %>
+      </div>
+    </section>
+
+    <section class="col-sm-6 col-md-7 col-lg-8">
+      <h2 class="mb-3 text-md-start text-center">
+        <% if(user.campgrounds && user.campgrounds.length){ %>
+          Campgrounds <%=user.username %> created
+        <% } else { %>
+          No campgrounds created
+        <% } %>
+      </h2>
+
+      <article class="row row-cols-sm-1 row-cols-md-2 row-cols-xl-3 g-4 g-sm-3">
+        <% for(let campground of user.campgrounds){ %>
+          <section>
+            <div class="card mx-3 mx-sm-0">
+              <img
+                src="<%= campground.images.length ? campground.images[0].square : 
+                'https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png'
+                %>"
+                alt="<%= campground.title %>'s picture"
+                class="card-img-top campground-image" />
+              <div class="card-body text-truncate">
+                <h3 class="card-title fs-4 text-truncate">
+                  <%= campground.title %>
+                </h3>
+                <small class="text-muted"><%= campground.location %></small>
+              </div>
+              <a
+                href="/campgrounds/<%= campground._id %>"
+                class="btn btn-primary rounded-0 rounded-bottom stretched-link py-2">
+                View
+              </a>
+            </div>
+          </section>
+        <% } %>
+      </article>
+    </section>
+  </article>
 </div>
