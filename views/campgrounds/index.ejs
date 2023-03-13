@@ -1,56 +1,76 @@
-<%- layout('layouts/boilerplate') %>
-<% block('head').append('<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>') %>
-<% block('head').append('<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css">') %>
-<% block('head').append('<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>') %>
-<% block('head').append('<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css" type="text/css">') %>
+<%- layout('layouts/boilerplate') %> 
+<% block('head').append(`
+<link
+  rel="stylesheet"
+  href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" />
+<link
+  rel="stylesheet"
+  href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css"
+  type="text/css" />
+<script
+  defer
+  src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+<script
+  defer
+  src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>
+<script
+  defer
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+<script defer src="/js/clusterMap.js"></script>
+<script defer src="/js/paginate.js"></script>
+`) %>
 
 <div id="cluster-map"></div>
-<div class="container mt-5" id="campgrounds-container">
-    <h1 class="display-4 mb-4 text-md-start text-center">All Campgrounds</h1>
+
+<div class="container-lg mb-3">
+  <h1 class="mt-4 mb-3">All Campgrounds</h1>
+  <article
+    class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 g-sm-3"
+    id="campgrounds-container">
     <% for(let campground of campgrounds.docs){ %>
-        <article class="card mb-3 mx-3 mx-md-0">
-            <div class="row g-0">
-                <div class="col-md-4 col-lg-3">
-                    <% if(campground.images.length){ %>
-                        <img src="<%= campground.images[0].square %>" alt="" class="img-fluid">
-                    <% } else { %>
-                        <img src="https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png"
-                             alt="" class="img-fluid">
-                    <% } %>
-                </div>
-                <div class="col-md-8 col-lg-9">
-                    <div class="card-body text-md-start text-center p-4">
-                        <h5 class="card-title display-4 fs-3"><%= campground.title %></h5>
-                        <p class="card-text">
-                          <%= campground.description.length > 200 
-                          ? campground.description.substr(0, 200) + '...' 
-                          : campground.description %>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted"><%= campground.location %></small>
-                        </p>
-                        <a href="/campgrounds/<%= campground._id %>"
-                           class="btn btn-primary">View <%= campground.title %></a>
-                    </div>
-                </div>
+      <section>
+        <div class="card mx-3 mx-sm-0">
+          <img
+            src="<%= campground.images.length ? campground.images[0].square :  'https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png'%>"
+            alt="<%= campground.title %>'s picture"
+            class="card-img-top campground-image" />
+          <div class="card-body">
+            <h3 class="card-title fs-4 text-truncate"><%= campground.title %></h3>
+            <p class="card-text campground-description">
+              <%= campground.description %>
+            </p>
+            <div class="text-muted text-truncate small">
+              <%= campground.location %>
             </div>
-        </article>
+          </div>
+          <a
+            href="/campgrounds/<%= campground._id %>"
+            class="btn btn-primary rounded-0 rounded-bottom stretched-link text-truncate py-2">
+            View <%= campground.title %>
+          </a>
+        </div>
+      </section>
     <% } %>
+  </article>
 </div>
+
 <div class="text-center my-5">
-    <% if(campgrounds.docs && campgrounds.hasNextPage){ %>
-        <a href="/campgrounds?page=<%= campgrounds.nextPage %>" class="btn btn-outline-primary btn-lg" id="paginate">
-            View More
-        </a>
-    <% } %>
-    <p id="end-of-data" class="lead <%= campgrounds.totalDocs ? 'd-none' : '' %>">No Campgrounds Found</p>
+  <% if(campgrounds.docs && campgrounds.hasNextPage){ %>
+    <a
+      href="/campgrounds?page=<%= campgrounds.nextPage %>"
+      class="btn btn-outline-primary btn-lg"
+      id="paginate">
+      View More
+    </a>
+  <% } %>
+  <p id="end-of-data" class="lead <%= campgrounds.totalDocs ? 'd-none' : '' %>">
+    No Campgrounds Found
+  </p>
 </div>
 
 <script>
-    const mapToken = '<%- process.env.MAPBOX_TOKEN %>';
-    const campgrounds = {features: <%- JSON.stringify(allCampgrounds) %>}
+  const mapToken = "<%- process.env.MAPBOX_TOKEN %>";
+  const campgrounds = { features: <%- JSON.stringify(allCampgrounds) %> };
 </script>
-<% block('footer').append('<script src="/js/clusterMap.js"></script>') %>
-<% block('footer').append('<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>') %>
-<% block('footer').append('<script src="/js/paginate.js"></script>') %>
-
