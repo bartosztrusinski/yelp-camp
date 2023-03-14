@@ -1,65 +1,87 @@
 <%- layout('layouts/boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="/css/user-form.css">') %>
+<% block('head').append(`
+<link rel="stylesheet" href="/css/user-form.css" />
+<script defer src="/js/validateForms.js"></script>
+`) %>
 
 <div class="d-flex container justify-content-center align-items-center my-5">
-    <div class="row">
-        <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-4">
-            <div class="card shadow">
-                <img src="https://images.unsplash.com/photo-1492648272180-61e45a8d98a7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-                     alt="" class="card-img-top">
-                <div class="card-body">
-                    <h1 class="mb-4 card-title display-4 fs-2 text-center">Register</h1>
-                    <form action="/register" method="POST" class="validated-form user-form" novalidate>
-                        <div class="form-floating">
-                            <input class="form-control top-input" type="text" id="username" name="username"
-                                   placeholder="Username"
-                                   required autofocus>
-                            <label class="form-label" for="username">Username</label>
-                            <div class="valid-feedback mb-2">
-                                Looks good!
-                            </div>
-                        </div>
-                        <div class="form-floating">
-                            <input class="form-control middle-input" type="email" id="email" name="email[address]"
-                                   placeholder="Email address"
-                                   required>
-                            <label class="form-label" for="email">Email address</label>
-                            <div class="valid-feedback mb-2">
-                                Looks good!
-                            </div>
-                        </div>
-                        <div class="form-floating">
-                            <input class="form-control middle-input" type="password" id="password" name="password"
-                                   placeholder="Password" required aria-describedby="passwordHelp">
-                            <label class="form-label" for="password">Password</label>
-                            <div class="valid-feedback mb-2">
-                                Looks good!
-                            </div>
-                        </div>
-                        <div class="form-floating">
-                            <input class="form-control bottom-input" type="password" id="retypePassword"
-                                   name="retypePassword"
-                                   placeholder="Retype Password" required>
-                            <label class="form-label" for="retypePassword">Retype Password</label>
-                            <div class="valid-feedback mb-2">
-                                Looks good!
-                            </div>
-                        </div>
-                        <div class="form-text" id="passwordHelp">
-                            Password must contain at least
-                            <strong>one uppercase letter, one lowercase letter, a number</strong>
-                            and must be
-                            <strong>at least 8 characters</strong>
-                        </div>
-                        <div class="d-grid mt-4">
-                            <button class="btn btn-success mb-2">Register</button>
-                            <a href="/login" class="btn btn-outline-primary mb-2">Already registered? Log In</a>
-                        </div>
-                    </form>
-                </div>
+  <div class="row">
+    <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-4">
+      <div class="card shadow">
+        <img
+          src="https://images.unsplash.com/photo-1492648272180-61e45a8d98a7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+          alt=""
+          class="card-img-top" />
+        <div class="card-body">
+          <h1 class="mb-4 card-title display-4 fs-2 text-center">Register</h1>
+          <form
+            action="/register"
+            method="POST"
+            class="validated-form user-form"
+            novalidate>
+            <div class="form-floating">
+              <input
+                class="form-control top-input"
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Username"
+                required
+                autofocus />
+              <label class="form-label" for="username">Username</label>
+              <div class="valid-feedback mb-2">Looks good!</div>
             </div>
+            <div class="form-floating">
+              <input
+                class="form-control middle-input"
+                type="email"
+                id="email"
+                name="email[address]"
+                placeholder="Email address"
+                required />
+              <label class="form-label" for="email">Email address</label>
+              <div class="valid-feedback mb-2">Looks good!</div>
+            </div>
+            <div class="form-floating">
+              <input
+                class="form-control middle-input"
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Password"
+                required
+                aria-describedby="password-help" />
+              <label class="form-label" for="password">Password</label>
+              <div class="valid-feedback mb-2">Looks good!</div>
+            </div>
+            <div class="form-floating">
+              <input
+                class="form-control bottom-input"
+                type="password"
+                id="retypePassword"
+                name="retypePassword"
+                placeholder="Retype Password"
+                required />
+              <label class="form-label" for="retypePassword">
+                Retype Password
+              </label>
+              <div class="valid-feedback mb-2">Looks good!</div>
+            </div>
+            <div class="form-text" id="password-help">
+              Password must contain at least
+              <strong>one uppercase letter, one lowercase letter, a number</strong>
+              and must be
+              <strong>at least 8 characters</strong>
+            </div>
+            <div class="d-grid mt-4">
+              <button class="btn btn-success mb-2">Register</button>
+              <a href="/login" class="btn btn-outline-primary mb-2">
+                Already registered? Log In
+              </a>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-
-<% block('footer').append('<script src="/js/validateForms.js"></script>') %>

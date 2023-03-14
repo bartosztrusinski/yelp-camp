@@ -1,7 +1,11 @@
 <%- layout('layouts/boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="/css/not-found.css">') %>
+<% block('head').append(`
+<link rel="stylesheet" href="/css/not-found.css" />
+`) %>
 
-<div id="not-found-text" class="text-white text-center display-4">
+<div class="not-found-container d-flex flex-fill place-center">
+  <div class="text-white text-center display-4 m-auto">
     <h1 class="display-1 m-0">404</h1>
     <p class="display-4 lead m-0">not found</p>
+  </div>
 </div>
