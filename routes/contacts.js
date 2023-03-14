@@ -1,11 +1,11 @@
-const express = require('express')
-    , router = express.Router()
-    , contacts = require('../controllers/contacts')
-    , catchAsync = require('../utils/catchAsync');
+const express = require('express');
+const router = express.Router();
+const contactsController = require('../controllers/contacts');
+const catchAsync = require('../utils/catchAsync');
 
-
-router.route('/')
-    .get(contacts.renderContactPage)
-    .post(catchAsync(contacts.sendContactMail))
+router
+  .route('/')
+  .get(contactsController.renderContactPage)
+  .post(catchAsync(contactsController.sendContactMail));
 
 module.exports = router;
