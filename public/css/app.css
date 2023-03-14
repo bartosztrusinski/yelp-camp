@@ -1,26 +1,38 @@
-#cluster-map{
-    width: 100%;
-    height: 50vh;
+#cluster-map {
+  min-height: 50vh;
+  min-height: 50dvh;
 }
 
-#map{
-    width: 100%;
-    height: 300px;
+#camp-map {
+  min-height: min(18.75rem, 50vh);
+  min-height: min(18.75rem, 50dvh);
 }
 
-#profile-thumbnail{
-    width: 35px;
-    height: 35px;
+#password-help {
+  font-size: 0.875rem;
 }
 
-#passwordHelp{
-    font-size: 0.78rem;
+.mapboxgl-ctrl-geocoder {
+  max-width: 50%;
 }
 
-.dropdown-toggle:after{
-    vertical-align: middle;
+.dropdown-toggle:after {
+  vertical-align: middle;
 }
 
-.dropdown-menu-dark .dropdown-item:active{
-    background-color: #198754;
+.dropdown-menu-dark .dropdown-item:active {
+  background-color: #198754;
+}
+
+.campground-image {
+  height: 13.75rem;
+  object-fit: cover;
+  object-position: center;
+}
+
+.campground-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
