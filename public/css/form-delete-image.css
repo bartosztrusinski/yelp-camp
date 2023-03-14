@@ -1,37 +1,37 @@
-.delete-image-animate{
-    position: relative;
+.delete-image-animate {
+  position: relative;
 }
 
-.delete-image-animate .delete-image-label{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    cursor: pointer;
-    height: 100%;
-    opacity: 0;
-    padding: 3.5rem;
-    fill: #e22;
-    border-radius: .25rem;
-    transition: 0.2s linear all;
+.delete-image-animate .delete-image-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  cursor: pointer;
+  height: 100%;
+  opacity: 0;
+  padding: 3.5rem;
+  fill: #e22;
+  border-radius: 0.25rem;
+  transition: 0.2s linear all;
 }
 
-.delete-image-label:hover{
-    opacity: 0.6;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+.delete-image-label:hover {
+  opacity: 0.6;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
 }
 
-.delete-image-checkbox{
-    cursor: pointer;
-    border-color: #198754;
+.delete-image-checkbox {
+  cursor: pointer;
+  border-color: #198754;
 }
 
-.delete-image-checkbox:checked{
-    background-color: #198754;
-    border-color: #198754;
+.delete-image-checkbox:checked {
+  background-color: #198754;
+  border-color: #198754;
 }
 
-.delete-image-checkbox:focus{
-    box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
-    border-color: #198754;
+.delete-image-checkbox:focus {
+  box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
+  border-color: #198754;
 }
