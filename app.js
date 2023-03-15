@@ -62,9 +62,16 @@ const sessionConfig = {
   resave: true,
   rolling: true,
   saveUninitialized: false,
-  cookie: { httpOnly: true, secure: true },
+  cookie: { httpOnly: true, secure: false },
   store: new redisStore({ client: redisClient }),
 };
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1);
+  sessionConfig.cookie.secure = true;
+  sessionConfig.proxy = true;
+}
+
 app.use(session(sessionConfig));
 app.use(flash());
 app.use(helmet());
