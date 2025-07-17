@@ -1,29 +1,43 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
+const ExpressError = require('./ExpressError');
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendVerificationMail = async (user, token) => {
-  await transporter.sendMail(verificationMail(user, token));
+  const { error } = await resend.emails.send(verificationMail(user, token));
+
+  if (error) {
+    throw new ExpressError(
+      'There was an error sending the verification email. Please try again later.',
+      500
+    );
+  }
 };
 
 const sendPasswordResetMail = async (user, token) => {
-  await transporter.sendMail(passwordResetMail(user, token));
+  const { error } = await resend.emails.send(passwordResetMail(user, token));
+
+  if (error) {
+    throw new ExpressError(
+      'There was an error sending the password reset email. Please try again later.',
+      500
+    );
+  }
 };
 
 const sendContactMail = async (name, email, message) => {
-  await transporter.sendMail(contactMail(name, email, message));
+  const { error } = await resend.emails.send(contactMail(name, email, message));
+
+  if (error) {
+    throw new ExpressError(
+      'There was an error sending the contact email. Please try again later.',
+      500
+    );
+  }
 };
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USERNAME,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
-
 const verificationMail = (user, token) => ({
-  from: '"Yelp Camp 🏕" <yelp@camp.com>',
+  from: `"Yelp Camp 🏕" <${process.env.FROM_EMAIL_ADDRESS}>`,
   to: user.email.address,
   subject: 'Yelp Camp - Verify Account',
   text: `Hello ${user.username},\n\n
@@ -32,11 +46,11 @@ const verificationMail = (user, token) => ({
     Thank You!\n`,
   html: `<h1>Hello, ${user.username}!</h1>
     <p>Please verify your account by clicking the link below. Thank You!</p>
-    <a href='${process.env.BASE_URL}/verify/${token}'>Click here to verify!</a>`,
+    <a href='${process.env.BASE_URL}/verify/${token}'>Click here to verify</a>`,
 });
 
 const passwordResetMail = (user, token) => ({
-  from: '"Yelp Camp 🏕" <yelp@camp.com>',
+  from: `"Yelp Camp 🏕" <${process.env.FROM_EMAIL_ADDRESS}>`,
   to: user.email.address,
   subject: 'Yelp Camp - Reset Password',
   text: `Hello ${user.username},\n\n
@@ -45,12 +59,12 @@ const passwordResetMail = (user, token) => ({
     Thank You!\n`,
   html: `<h1>Hello, ${user.username}!</h1>
     <p>Please reset your password by clicking the link below. Thank You!</p>
-    <a href='${process.env.BASE_URL}/reset/${token}?id=${user._id}'>Click here to verify!</a>`,
+    <a href='${process.env.BASE_URL}/reset/${token}?id=${user._id}'>Click here to verify</a>`,
 });
 
 const contactMail = (name, email, message) => ({
-  from: '"Yelp Camp 🏕" <yelp@camp.com>',
-  to: process.env.SMTP_USERNAME,
+  from: `"Yelp Camp 🏕" <${process.env.FROM_EMAIL_ADDRESS}>`,
+  to: process.env.CONTACT_EMAIL_ADDRESS,
   subject: 'Yelp Camp - Contact Message',
   text: `${name} sent message:\n\n${message}\n\n`,
   html: `<h1>${name} sent message:</h1>

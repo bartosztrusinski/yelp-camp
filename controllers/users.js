@@ -69,9 +69,9 @@ const sendVerificationMail = async (req, res) => {
 
   req.flash(
     'success',
-    `A verification email has been sent to ${email}. It will be expire after one hour. 
-                                If you did not get the email, click <a href='/resend'>here</a> to resend token!`
+    `A verification email has been sent to ${email}. It will be expire after one hour. If you did not get the email, click <a href='/resend'>here</a> to resend token!`
   );
+
   res.redirect('/campgrounds');
 };
 
