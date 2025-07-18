@@ -49,7 +49,7 @@ const campgroundSchema = new Schema(
 
 campgroundSchema.virtual('properties.popUpMarkup').get(function () {
   return `<strong>${this.title}</strong><br><a href="/campgrounds/${this._id}"
-            class="text-decoration-none badge bg-success text-white text-wrap text-uppercase">Show Camp</a>`;
+            class="text-decoration-none badge bg-success text-light text-wrap text-uppercase">Show Camp</a>`;
 });
 
 campgroundSchema.virtual('dateFormatted').get(function () {

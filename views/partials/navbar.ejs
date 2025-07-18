@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top p-2">
+<nav class="navbar bg-dark navbar-expand-md sticky-top p-2" data-bs-theme="dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="/">
       <h2 class="fw-bold">YelpCamp</h2>
@@ -26,7 +26,7 @@
             Campgrounds
           </a>
           <ul
-            class="dropdown-menu dropdown-menu-dark"
+            class="dropdown-menu"
             aria-labelledby="campgroundLinks">
             <li>
               <a class="dropdown-item" href="/campgrounds">
@@ -101,7 +101,7 @@
             User Links
           </a>
           <ul
-            class="dropdown-menu dropdown-menu-dark dropdown-menu-end"
+            class="dropdown-menu dropdown-menu-end"
             aria-labelledby="userLinks">
             <li>
               <a class="dropdown-item" href="/resend">
@@ -161,7 +161,7 @@
             <span class="me-md-1 d-md-none"><%= currentUser.username %></span>
           </a>
           <ul
-            class="dropdown-menu dropdown-menu-dark dropdown-menu-end"
+            class="dropdown-menu dropdown-menu-end"
             aria-labelledby="profileLinks">
             <li>
               <a class="dropdown-item" href="/users/<%= currentUser._id %>">

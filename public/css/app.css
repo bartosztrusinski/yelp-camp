@@ -1,15 +1,11 @@
 #cluster-map {
-  min-height: 50vh;
-  min-height: 50dvh;
+  min-height: 40vh;
+  min-height: 40dvh;
 }
 
 #camp-map {
-  min-height: min(18.75rem, 50vh);
-  min-height: min(18.75rem, 50dvh);
-}
-
-#password-help {
-  font-size: 0.875rem;
+  min-height: min(18.75rem, 40vh);
+  min-height: min(18.75rem, 40dvh);
 }
 
 .mapboxgl-ctrl-geocoder {
@@ -20,12 +16,12 @@
   vertical-align: middle;
 }
 
-.dropdown-menu-dark .dropdown-item:active {
-  background-color: #198754;
+.dropdown-menu .dropdown-item:active {
+  background-color: hsl(152, 69%, 31%);
 }
 
 .campground-image {
-  height: 13.75rem;
+  max-height: 13.75rem;
   object-fit: cover;
   object-position: center;
 }
@@ -34,5 +30,6 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   overflow: hidden;
 }

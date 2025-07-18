@@ -58,30 +58,25 @@
                 class="form-control middle-input user-textarea"
                 id="bio"
                 name="bio"
-                placeholder="Bio">
-                <%= user.bio %>
-              </textarea>
+                placeholder="Bio"><%= user.bio %></textarea>
               <label class="form-label" for="bio">Tell Us About Yourself</label>
             </div>
-            <div class="input-group">
-              <span class="input-group-text" id="phone-prefix">+</span>
-              <div class="form-floating flex-grow-1">
-                <input
-                  class="form-control bottom-input"
-                  type="tel"
-                  id="phone-number"
-                  name="phoneNumber"
-                  placeholder="12 345678901"
-                  pattern="[0-9]{1,3} [0-9]{4,11}"
-                  aria-describedby="phoneHelp"
-                  value="<%= user.phoneNumber %>" />
-                <label class="form-check-label" for="phoneNumber">
-                  Phone Number
-                </label>
-              </div>
-              <div id="phoneHelp" class="form-text">
-                Phone number should look like: +34 556035668
-              </div>
+            <div class="form-floating">
+              <input
+                class="form-control bottom-input"
+                type="tel"
+                id="phone-number"
+                name="phoneNumber"
+                placeholder="12 345678901"
+                pattern="[0-9]{1,3} [0-9]{4,11}"
+                aria-describedby="phoneHelp"
+                value="<%= user.phoneNumber %>" />
+              <label class="form-check-label" for="phoneNumber">
+                Phone Number
+              </label>
+            </div>
+            <div id="phoneHelp" class="form-text">
+              Phone number should look like: +34 556035668
             </div>
             <div class="form-check form-switch mt-2">
               <input 
