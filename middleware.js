@@ -5,7 +5,7 @@ const User = require('./models/user');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const geocoder = mbxGeocoding({ accessToken: process.env.MAPBOX_TOKEN });
+const geocoder = mbxGeocoding({ accessToken: process.env.MAPBOX_PUBLIC_TOKEN });
 const { VerificationToken, PasswordToken } = require('./models/token');
 const { deleteUploadedImages } = require('./cloudinary');
 const {
