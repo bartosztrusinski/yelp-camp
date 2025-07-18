@@ -11,6 +11,15 @@
 <script defer src="/js/validateForms.js"></script>
 `) %>
 
+<script>
+  const mapToken = '<%- process.env.MAPBOX_PUBLIC_TOKEN %>';
+  const campground = <%- JSON.stringify({
+      title: campground.title,
+      location: campground.location,
+      geometry: campground.geometry
+  }) %>;
+</script>
+
 <div class="container-lg px-4 px-sm-3 mt-3 mb-5">
   <article class="row g-4">
     <section class="col-sm-6 col-md-5">
@@ -332,11 +341,3 @@
   </article>
 </div>
 
-<script>
-  const mapToken = '<%- process.env.MAPBOX_PUBLIC_TOKEN %>';
-  const campground = <%- JSON.stringify({
-      title: campground.title,
-      location: campground.location,
-      geometry: campground.geometry
-  }) %>;
-</script>

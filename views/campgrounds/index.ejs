@@ -17,6 +17,11 @@
 <script defer src="/js/paginate.js"></script>
 `) %>
 
+<script>
+  const mapToken = '<%- process.env.MAPBOX_PUBLIC_TOKEN %>';
+  const campgrounds = { features: <%- JSON.stringify(allCampgrounds) %> };
+</script>
+
 <div id="cluster-map"></div>
 
 <div class="container-lg mb-3">
@@ -64,8 +69,3 @@
     No Campgrounds Found
   </p>
 </div>
-
-<script>
-  const mapToken = "<%- process.env.MAPBOX_PUBLIC_TOKEN %>";
-  const campgrounds = { features: <%- JSON.stringify(allCampgrounds) %> };
-</script>
