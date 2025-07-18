@@ -95,8 +95,7 @@ const sendPasswordResetMail = async (req, res) => {
 
   req.flash(
     'success',
-    `A password reset email has been sent to ${email}. It will be expire after one hour.
-                            If you did not get the email, click <a href='/forgot'>here</a> to resend token!`
+    `A password reset email has been sent to ${email}. It will be expire after one hour. If you did not get the email, click <a href='/forgot'>here</a> to resend token!`
   );
   res.redirect('/campgrounds');
 };

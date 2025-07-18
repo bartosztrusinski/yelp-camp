@@ -1,5 +1,5 @@
 const paginate = document.querySelector('#paginate');
-const campgroundsContainer = $('#campgrounds-container');
+const campgroundsContainer = document.querySelector('#campgrounds-container');
 const endOfData = document.querySelector('#end-of-data');
 
 if (paginate) {
@@ -28,32 +28,26 @@ const requestNextPage = async function (url) {
 const generatePage = function (data) {
   for (let doc of data.docs) {
     let template = generateDocTemplate(doc);
-    campgroundsContainer.append(template);
+    campgroundsContainer.insertAdjacentHTML('beforeend', template);
   }
 };
 
 const generateDocTemplate = function (campground) {
+  const imageUrl = campground.images.length
+    ? campground.images[0].square
+    : 'https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png';
+
   return `<section>
             <div class="card mx-3 mx-sm-0">
               <img
-                src="${
-                  campground.images.length
-                    ? campground.images[0].square
-                    : 'https://res.cloudinary.com/bartoszt/image/upload/q_100,w_600,ar_1:1,c_fill,g_center,x_0,y_0/v1615231919/yelp_camp.png'
-                }"
+                src="${imageUrl}"
                 alt="${campground.title}'s picture"
                 class="card-img-top campground-image"
               />
               <div class="card-body">
-                <h3 class="card-title fs-4 text-truncate">${
-                  campground.title
-                }</h3>
-                <p class="card-text campground-description">
-                ${campground.description}
-                </p>
-                <div class="text-muted text-truncate small">
-                ${campground.location}
-                </div>
+                <h2 class="card-title fs-5 text-truncate">${campground.title}</h2>
+                <p class="card-text campground-description">${campground.description}</p>
+                <div class="text-muted text-truncate small">${campground.location}</div>
               </div>
               <a
                 href="/campgrounds/${campground._id}"

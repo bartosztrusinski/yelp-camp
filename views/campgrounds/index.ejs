@@ -13,11 +13,6 @@
 <script
   defer
   src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.1.0/mapbox-gl-geocoder.min.js"></script>
-<script
-  defer
-  src="https://code.jquery.com/jquery-3.6.0.min.js"
-  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-  crossorigin="anonymous"></script>
 <script defer src="/js/clusterMap.js"></script>
 <script defer src="/js/paginate.js"></script>
 `) %>
@@ -37,7 +32,7 @@
             alt="<%= campground.title %>'s picture"
             class="card-img-top campground-image" />
           <div class="card-body">
-            <h3 class="card-title fs-4 text-truncate"><%= campground.title %></h3>
+            <h2 class="card-title fs-5 text-truncate"><%= campground.title %></h2>
             <p class="card-text campground-description">
               <%= campground.description %>
             </p>
