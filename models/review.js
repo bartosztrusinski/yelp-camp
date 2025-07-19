@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const formatDistanceToNow = require('date-fns/formatDistanceToNow');
+import mongoose, { Schema } from 'mongoose';
+import { formatDistanceToNow } from 'date-fns';
 
 const reviewSchema = new Schema({
   body: { type: String, required: true, min: 5, max: 500 },
@@ -15,4 +14,4 @@ reviewSchema.virtual('dateFormatted').get(function () {
 
 const Review = mongoose.model('Review', reviewSchema);
 
-module.exports = Review;
+export { Review };

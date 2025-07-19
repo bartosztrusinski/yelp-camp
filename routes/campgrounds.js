@@ -1,58 +1,60 @@
-const express = require('express');
-const router = express.Router();
-const catchAsync = require('../utils/catchAsync');
-const campgroundsController = require('../controllers/campgrounds');
-const upload = require('../cloudinary/upload');
-const { campgroundCreateBruteForce } = require('../utils/expressBrute');
-const {
+import { Router } from 'express';
+import { saveImageToMemory } from '../cloudinary.js';
+// import { campgroundCreateBruteForce } from '../utils/expressBrute.js';
+import {
+  index,
+  createCampground,
+  renderNewForm,
+  showCampground,
+  updateCampground,
+  destroyCampground,
+  renderEditForm,
+} from '../controllers/campgrounds.js';
+import {
   isLoggedIn,
   isCampAuthorOrAdmin,
   validateCampground,
   validateImageCount,
   isValidCampgroundID,
-} = require('../middleware');
+} from '../middleware.js';
 
-router
-  .route('/')
-  .get(catchAsync(campgroundsController.index))
-  .post(
-    isLoggedIn,
-    upload.array('image', 3),
-    catchAsync(validateCampground),
-    campgroundCreateBruteForce.prevent,
-    catchAsync(campgroundsController.createCampground)
-  );
+const router = Router();
 
-router.get('/new', isLoggedIn, campgroundsController.renderNewForm);
+router.route('/').get(index).post(
+  isLoggedIn,
+  saveImageToMemory.array('image', 3),
+  validateCampground,
+  // campgroundCreateBruteForce.prevent,
+  createCampground
+);
+
+router.get('/new', isLoggedIn, renderNewForm);
 
 router
   .route('/:id')
-  .get(
-    catchAsync(isValidCampgroundID),
-    catchAsync(campgroundsController.showCampground)
-  )
+  .get(isValidCampgroundID, showCampground)
   .put(
     isLoggedIn,
-    catchAsync(isValidCampgroundID),
+    isValidCampgroundID,
     isCampAuthorOrAdmin,
-    upload.array('image', 3),
+    saveImageToMemory.array('image', 3),
     validateImageCount,
-    catchAsync(validateCampground),
-    catchAsync(campgroundsController.updateCampground)
+    validateCampground,
+    updateCampground
   )
   .delete(
     isLoggedIn,
-    catchAsync(isValidCampgroundID),
+    isValidCampgroundID,
     isCampAuthorOrAdmin,
-    catchAsync(campgroundsController.destroyCampground)
+    destroyCampground
   );
 
 router.get(
   '/:id/edit',
   isLoggedIn,
-  catchAsync(isValidCampgroundID),
+  isValidCampgroundID,
   isCampAuthorOrAdmin,
-  catchAsync(campgroundsController.renderEditForm)
+  renderEditForm
 );
 
-module.exports = router;
+export default router;

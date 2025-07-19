@@ -1,32 +1,32 @@
-const express = require('express');
-const router = express.Router({ mergeParams: true });
-const catchAsync = require('../utils/catchAsync');
-const reviewsController = require('../controllers/reviews');
-const { reviewCreateBruteForce } = require('../utils/expressBrute');
-const {
+import { Router } from 'express';
+// import { reviewCreateBruteForce } from '../utils/expressBrute.js';
+import { createReview, destroyReview } from '../controllers/reviews.js';
+import {
   validateReview,
   isLoggedIn,
   isReviewAuthorOrAdmin,
   isValidCampgroundID,
   isValidReviewID,
-} = require('../middleware');
+} from '../middleware.js';
+
+const router = Router({ mergeParams: true });
 
 router.post(
   '/',
   isLoggedIn,
-  catchAsync(isValidCampgroundID),
-  catchAsync(validateReview),
-  reviewCreateBruteForce.prevent,
-  catchAsync(reviewsController.createReview)
+  isValidCampgroundID,
+  validateReview,
+  // reviewCreateBruteForce.prevent,
+  createReview
 );
 
 router.delete(
   '/:reviewId',
   isLoggedIn,
-  catchAsync(isValidCampgroundID),
-  catchAsync(isValidReviewID),
+  isValidCampgroundID,
+  isValidReviewID,
   isReviewAuthorOrAdmin,
-  catchAsync(reviewsController.destroyReview)
+  destroyReview
 );
 
-module.exports = router;
+export default router;

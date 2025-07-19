@@ -1,4 +1,4 @@
-const Review = require('../models/review');
+import { Review } from '../models/review.js';
 
 const createReview = async (req, res) => {
   const { id } = req.params;
@@ -25,13 +25,10 @@ const destroyReview = async (req, res) => {
   const { reviewId } = req.params;
 
   await campground.updateOne({ $pull: { reviews: reviewId } });
-  await review.remove();
+  await review.deleteOne();
 
   req.flash('success', 'Successfully deleted review!');
   res.redirect(`/campgrounds/${campground._id}`);
 };
 
-module.exports = {
-  createReview,
-  destroyReview,
-};
+export { createReview, destroyReview };

@@ -1,8 +1,7 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const passportLocalMongoose = require('passport-local-mongoose');
-const { PasswordToken, VerificationToken } = require('./token');
-const { cloudinary } = require('../cloudinary');
+import mongoose, { Schema } from 'mongoose';
+import passportLocalMongoose from 'passport-local-mongoose';
+import { PasswordToken, VerificationToken } from './token.js';
+import { cloudinary } from '../cloudinary.js';
 
 const imageSchema = new Schema({
   url: { type: String },
@@ -36,7 +35,7 @@ const userSchema = new Schema({
 });
 
 userSchema.post('save', function (error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
     return next(new Error('Email is already in use'));
   }
 
@@ -58,4 +57,4 @@ userSchema.plugin(passportLocalMongoose);
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+export { User };

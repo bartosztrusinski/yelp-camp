@@ -1,20 +1,21 @@
-const ExpressError = require('./utils/ExpressError');
-const Campground = require('./models/campground');
-const Review = require('./models/review');
-const User = require('./models/user');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const geocoder = mbxGeocoding({ accessToken: process.env.MAPBOX_PUBLIC_TOKEN });
-const { VerificationToken, PasswordToken } = require('./models/token');
-const { deleteUploadedImages } = require('./cloudinary');
-const {
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import mbxGeocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
+import { deleteUploadedImages } from './cloudinary.js';
+import { Campground } from './models/campground.js';
+import { Review } from './models/review.js';
+import { User } from './models/user.js';
+import { VerificationToken, PasswordToken } from './models/token.js';
+import { ExpressError } from './utils/ExpressError.js';
+import {
   campgroundSchema,
   reviewSchema,
   userSchema,
   passwordSchema,
   userProfileSchema,
-} = require('./schemas');
+} from './schemas.js';
+
+const geocoder = mbxGeocoding({ accessToken: process.env.MAPBOX_PUBLIC_TOKEN });
 
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -75,7 +76,7 @@ const isValidPasswordToken = async (req, res, next) => {
     throw new ExpressError('Reset token expired!', 400, '/forgot');
   }
 
-  const isValidToken = bcrypt.compare(token, passwordToken.token);
+  const isValidToken = await bcrypt.compare(token, passwordToken.token);
   if (!isValidToken) {
     throw new ExpressError(
       'Invalid or expired password reset token',
@@ -121,12 +122,10 @@ const isValidReviewID = async (req, res, next) => {
 };
 
 const handleInvalidID = (id) => {
-  if (!isIDValid(id)) {
+  if (!mongoose.isValidObjectId(id)) {
     throw new ExpressError('Could not find that path!', 400, '/campgrounds');
   }
 };
-
-const isIDValid = (id) => mongoose.Types.ObjectId.isValid(id);
 
 const findByIDAndValidate = async (id, model) => {
   const document = await model.findById(id);
@@ -277,7 +276,7 @@ const isPasswordCorrect = async (req, res, next) => {
   next();
 };
 
-module.exports = {
+export {
   isLoggedIn,
   isLoggedOut,
   isActive,

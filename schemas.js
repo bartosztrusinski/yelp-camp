@@ -1,5 +1,5 @@
-const BaseJoi = require('joi');
-const sanitizeHtml = require('sanitize-html');
+import BaseJoi from 'joi';
+import sanitizeHtml from 'sanitize-html';
 
 const extension = (joi) => ({
   type: 'string',
@@ -83,7 +83,7 @@ const userProfileSchema = Joi.object({
   }),
 });
 
-module.exports = {
+export {
   campgroundSchema,
   reviewSchema,
   userSchema,

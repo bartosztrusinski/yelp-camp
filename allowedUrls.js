@@ -26,9 +26,4 @@ const connectSrcUrls = [
 
 const fontSrcUrls = [];
 
-module.exports = {
-  scriptSrcUrls,
-  styleSrcUrls,
-  connectSrcUrls,
-  fontSrcUrls,
-};
+export { scriptSrcUrls, styleSrcUrls, connectSrcUrls, fontSrcUrls };

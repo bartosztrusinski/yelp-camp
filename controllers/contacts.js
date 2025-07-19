@@ -1,4 +1,4 @@
-const mailTransport = require('../utils/mailTransport');
+import * as mailTransport from '../utils/mailTransport.js';
 
 const renderContactPage = (req, res) => {
   res.render('contact');
@@ -16,4 +16,4 @@ const sendContactMail = async (req, res) => {
   res.redirect('/campgrounds');
 };
 
-module.exports = { renderContactPage, sendContactMail };
+export { renderContactPage, sendContactMail };

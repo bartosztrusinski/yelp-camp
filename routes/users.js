@@ -1,16 +1,34 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
-const upload = require('../cloudinary/upload');
-const catchAsync = require('../utils/catchAsync');
-const usersController = require('../controllers/users');
-const {
-  passwordResetBruteForce,
-  passwordChangeBruteForce,
-  loginBruteForce,
-  registerBruteForce,
-} = require('../utils/expressBrute');
-const {
+import { Router } from 'express';
+const router = Router();
+import passport from 'passport';
+import { saveImageToMemory } from '../cloudinary.js';
+// import {
+//   passwordResetBruteForce,
+//   passwordChangeBruteForce,
+//   loginBruteForce,
+//   registerBruteForce,
+// } from '../utils/expressBrute.js';
+import {
+  renderLogin,
+  login,
+  logout,
+  renderRegister,
+  register,
+  renderUserProfile,
+  updateUserProfile,
+  changePassword,
+  deleteUser,
+  renderEditForm,
+  renderPasswordChangeForm,
+  renderVerifyForm,
+  sendVerificationMail,
+  verifyUser,
+  renderForgotForm,
+  sendPasswordResetMail,
+  renderResetForm,
+  resetPassword,
+} from '../controllers/users.js';
+import {
   isLoggedIn,
   isLoggedOut,
   isActive,
@@ -22,113 +40,96 @@ const {
   isValidVerificationToken,
   isValidPasswordToken,
   isPasswordCorrect,
-} = require('../middleware');
+} from '../middleware.js';
 
 router
   .route('/login')
-  .get(isLoggedOut, usersController.renderLogin)
+  .get(isLoggedOut, renderLogin)
   .post(
     isLoggedOut,
     // prevent too many attempts for the same username
-    loginBruteForce.getMiddleware({
-      key: (req, res, next) => next(req.body.username),
-    }),
-    catchAsync(isActive),
+    // loginBruteForce.getMiddleware({
+    //   key: (req, res, next) => next(req.body.username),
+    // }),
+    isActive,
     passport.authenticate('local', {
       failureFlash: true,
       failureRedirect: '/login',
     }),
-    usersController.login
+    login
   );
 
-router.get('/logout', isLoggedIn, usersController.logout);
+router.get('/logout', isLoggedIn, logout);
 
-router
-  .route('/register')
-  .get(isLoggedOut, usersController.renderRegister)
-  .post(
-    isLoggedOut,
-    catchAsync(validateUser),
-    registerBruteForce.prevent,
-    catchAsync(usersController.register)
-  );
+router.route('/register').get(isLoggedOut, renderRegister).post(
+  isLoggedOut,
+  validateUser,
+  //  registerBruteForce.prevent,
+  register
+);
 
 router
   .route('/users/:id')
-  .get(catchAsync(isValidUserID), usersController.renderUserProfile)
+  .get(isValidUserID, renderUserProfile)
   .patch(
     isLoggedIn,
-    catchAsync(isValidUserID),
+    isValidUserID,
     isProfileOwnerOrAdmin,
-    upload.single('profilePicture'),
-    catchAsync(validateUserProfile),
-    catchAsync(usersController.updateUserProfile)
+    saveImageToMemory.single('profilePicture'),
+    validateUserProfile,
+    updateUserProfile
   )
   .put(
     isLoggedIn,
-    catchAsync(isValidUserID),
+    isValidUserID,
     isProfileOwnerOrAdmin,
-    catchAsync(validatePassword),
-    passwordChangeBruteForce.prevent,
-    catchAsync(isPasswordCorrect),
-    catchAsync(usersController.changePassword)
+    validatePassword,
+    // passwordChangeBruteForce.prevent,
+    isPasswordCorrect,
+    changePassword
   )
-  .delete(
-    isLoggedIn,
-    catchAsync(isValidUserID),
-    isProfileOwnerOrAdmin,
-    catchAsync(usersController.deleteUser)
-  );
+  .delete(isLoggedIn, isValidUserID, isProfileOwnerOrAdmin, deleteUser);
 
 router.get(
   '/users/:id/edit',
   isLoggedIn,
-  catchAsync(isValidUserID),
+  isValidUserID,
   isProfileOwnerOrAdmin,
-  usersController.renderEditForm
+  renderEditForm
 );
 
 router.get(
   '/users/:id/change-password',
   isLoggedIn,
-  catchAsync(isValidUserID),
+  isValidUserID,
   isProfileOwnerOrAdmin,
-  usersController.renderPasswordChangeForm
+  renderPasswordChangeForm
 );
 
 router
   .route('/resend')
-  .get(isLoggedOut, usersController.renderVerifyForm)
-  .post(isLoggedOut, catchAsync(usersController.sendVerificationMail));
+  .get(isLoggedOut, renderVerifyForm)
+  .post(isLoggedOut, sendVerificationMail);
 
-router.get(
-  '/verify/:token',
-  isLoggedOut,
-  catchAsync(isValidVerificationToken),
-  catchAsync(usersController.verifyUser)
-);
+router.get('/verify/:token', isLoggedOut, isValidVerificationToken, verifyUser);
 
 router
   .route('/forgot')
-  .get(isLoggedOut, usersController.renderForgotForm)
-  .post(isLoggedOut, catchAsync(usersController.sendPasswordResetMail));
+  .get(isLoggedOut, renderForgotForm)
+  .post(isLoggedOut, sendPasswordResetMail);
 
 router
   .route('/reset/:token')
-  .get(
-    isLoggedOut,
-    catchAsync(isValidPasswordToken),
-    usersController.renderResetForm
-  )
+  .get(isLoggedOut, isValidPasswordToken, renderResetForm)
   .post(
     isLoggedOut,
-    catchAsync(isValidPasswordToken),
+    isValidPasswordToken,
     // prevent too many attempts for the same token
-    passwordResetBruteForce.getMiddleware({
-      key: (req, res, next) => next(req.params.token),
-    }),
-    catchAsync(validatePassword),
-    catchAsync(usersController.resetPassword)
+    // passwordResetBruteForce.getMiddleware({
+    //   key: (req, res, next) => next(req.params.token),
+    // }),
+    validatePassword,
+    resetPassword
   );
 
-module.exports = router;
+export default router;

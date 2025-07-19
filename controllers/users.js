@@ -1,18 +1,16 @@
-const User = require('../models/user');
-const ExpressError = require('../utils/ExpressError');
-const bcrypt = require('bcrypt');
-const { cloudinary } = require('../cloudinary');
-const { VerificationToken, PasswordToken } = require('../models/token');
-const mailTransport = require('../utils/mailTransport');
+import bcrypt from 'bcrypt';
+import { cloudinary, uploadImageFromMemory } from '../cloudinary.js';
+import { User } from '../models/user.js';
+import { VerificationToken, PasswordToken } from '../models/token.js';
+import { ExpressError } from '../utils/ExpressError.js';
+import * as mailTransport from '../utils/mailTransport.js';
 
 const login = async (req, res) => {
   const redirectUrl = getPathToReturnTo(req);
   setSessionAge(req);
 
-  req.brute.reset(function () {
-    req.flash('success', 'Welcome back!');
-    res.redirect(redirectUrl);
-  });
+  req.flash('success', 'Welcome back!');
+  res.redirect(redirectUrl);
 };
 
 const getPathToReturnTo = (req) => {
@@ -29,23 +27,27 @@ const setSessionAge = (req) => {
 };
 
 const logout = (req, res) => {
-  req.logout();
-  req.flash('success', 'Goodbye!');
-  res.redirect('back');
+  req.logout((err) => {
+    if (err) {
+      throw new ExpressError('Logout failed', 500);
+    }
+
+    req.flash('success', 'Successfully logged out!');
+    res.redirect(req.get('Referrer') || '/');
+  });
 };
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
   const newUser = new User({ email, username });
   const registeredUser = await User.register(newUser, password);
-  const token = await issueNewVerificationToken(registeredUser._id);
 
+  const token = await issueNewVerificationToken(registeredUser._id);
   await mailTransport.sendVerificationMail(registeredUser, token);
 
   req.flash(
     'success',
-    `A verification email has been sent to ${registeredUser.email.address}. It will be expire after one day. 
-        If you did not get verification email, click <a href='/resend'>here</a> to resend token!`
+    `A verification email has been sent to ${registeredUser.email.address}. It will be expire after one day. If you did not get verification email, click <a href='/resend'>here</a> to resend token!`
   );
   res.redirect('/campgrounds');
 };
@@ -134,29 +136,35 @@ const resetPassword = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-  const { name, bio, showEmail, phoneNumber } = req.body;
-  const user = res.locals.user;
-  const isPublic = showEmail === 'yes';
+  const { name, bio, showEmail, phoneNumber, deletePicture } = req.body;
+  const { user } = res.locals;
+  const imageFile = req.file;
 
-  await user.updateOne({ name, bio, phoneNumber, 'email.public': isPublic });
+  await user.updateOne({
+    name,
+    bio,
+    phoneNumber,
+    'email.public': showEmail === 'yes',
+  });
 
-  if (req.body.deletePicture === 'yes') {
-    await updateProfilePictureTo(null, user);
-  } else if (req.file) {
-    const profilePicture = { url: req.file.path, filename: req.file.filename };
-    await updateProfilePictureTo(profilePicture, user);
+  if (user.profilePicture && (deletePicture === 'yes' || imageFile)) {
+    await cloudinary.uploader.destroy(user.profilePicture.filename);
+    user.profilePicture = null;
   }
+
+  if (imageFile) {
+    const { secure_url, public_id } = await uploadImageFromMemory(imageFile);
+
+    user.profilePicture = {
+      url: secure_url,
+      filename: public_id,
+    };
+  }
+
+  await user.save();
 
   req.flash('success', 'Successfully updated profile!');
   res.redirect(`/users/${user._id}`);
-};
-
-const updateProfilePictureTo = async (picture, user) => {
-  if (user.profilePicture) {
-    await cloudinary.uploader.destroy(user.profilePicture.filename);
-  }
-  user.profilePicture = picture;
-  await user.save();
 };
 
 const changePassword = async (req, res) => {
@@ -172,7 +180,7 @@ const changePassword = async (req, res) => {
 const deleteUser = async (req, res) => {
   const user = res.locals.user;
 
-  await user.remove();
+  await user.deleteOne();
 
   req.flash('success', 'Successfully deleted user!');
   res.redirect('/campgrounds');
@@ -187,12 +195,12 @@ const renderRegister = (req, res) => {
 };
 
 const renderUserProfile = async (req, res) => {
-  const user = await res.locals.user
-    .populate({
+  const user = await res.locals.user.populate([
+    {
       path: 'campgrounds',
       options: { sort: { dateCreated: -1 } },
-    })
-    .execPopulate();
+    },
+  ]);
 
   res.render('users/show', { user });
 };
@@ -234,7 +242,7 @@ const renderResetForm = (req, res) => {
   res.render('users/reset', { token, id });
 };
 
-module.exports = {
+export {
   login,
   logout,
   register,

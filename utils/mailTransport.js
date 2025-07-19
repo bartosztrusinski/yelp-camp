@@ -1,5 +1,5 @@
-const { Resend } = require('resend');
-const ExpressError = require('./ExpressError');
+import { Resend } from 'resend';
+import { ExpressError } from './ExpressError.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -75,8 +75,4 @@ const contactMail = (name, email, message) => ({
     </ul>`,
 });
 
-module.exports = {
-  sendVerificationMail,
-  sendPasswordResetMail,
-  sendContactMail,
-};
+export { sendVerificationMail, sendPasswordResetMail, sendContactMail };

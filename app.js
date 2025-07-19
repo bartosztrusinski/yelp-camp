@@ -1,69 +1,61 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+import 'dotenv/config';
 
-const express = require('express');
-const path = require('path');
-const mongoose = require('mongoose');
-const { RedisSessionStore: redisStore, redisClient } = require('./redis');
-const engine = require('ejs-mate');
-const methodOverride = require('method-override');
-const session = require('express-session');
-const flash = require('connect-flash');
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
-const User = require('./models/user');
-const mongoSanitize = require('express-mongo-sanitize');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
-const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
-const port = process.env.PORT || 3000;
-const campgroundRoutes = require('./routes/campgrounds');
-const reviewRoutes = require('./routes/reviews');
-const userRoutes = require('./routes/users');
-const contactRoutes = require('./routes/contacts');
-const {
+import path from 'path';
+import express from 'express';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import helmet from 'helmet';
+import engine from 'ejs-mate';
+import methodOverride from 'method-override';
+import flash from 'connect-flash';
+import { RedisStore } from 'connect-redis';
+import passport from 'passport';
+import LocalStrategy from 'passport-local';
+
+import { User } from './models/user.js';
+import { redisClient } from './redis.js';
+import { deleteUploadedImages } from './cloudinary.js';
+import {
   scriptSrcUrls,
   styleSrcUrls,
   connectSrcUrls,
   fontSrcUrls,
-} = require('./allowedUrls');
+} from './allowedUrls.js';
 
-mongoose.connect(dbUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
+import campgroundRoutes from './routes/campgrounds.js';
+import reviewRoutes from './routes/reviews.js';
+import userRoutes from './routes/users.js';
+import contactRoutes from './routes/contacts.js';
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => console.log('Connected to Database'));
-
-redisClient.on('error', (err) => console.log('Session store error: ', err));
-redisClient.on('connect', () => console.log('Connected to Session Store'));
+mongoose
+  .connect(process.env.DB_URL, { sanitizeFilter: true })
+  .catch((err) => console.error('MongoDB connection error:', err));
+mongoose.connection.on('error', (err) => console.error('MongoDB error:', err));
+mongoose.connection.once('open', () => console.log('Connected to MongoDB'));
 
 const app = express();
 
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(import.meta.dirname, 'views'));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(import.meta.dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.use(mongoSanitize());
-app.use(cookieParser(secret));
+app.use(cookieParser(process.env.SECRET));
 
 const sessionConfig = {
   name: 'session',
-  secret,
+  secret: process.env.SECRET,
   resave: true,
   rolling: true,
   saveUninitialized: false,
   cookie: { httpOnly: true, secure: false },
-  store: new redisStore({ client: redisClient }),
+  store: new RedisStore({
+    client: redisClient,
+    prefix: 'session:',
+  }),
 };
 
 if (app.get('env') === 'production') {
@@ -108,6 +100,7 @@ app.use((req, res, next) => {
   if (req.path !== '/login' && req.session.returnTo) {
     delete req.session.returnTo;
   }
+
   res.locals.currentUser = req.user;
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
@@ -123,13 +116,17 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
-app.all('*', (req, res) => {
+app.all('/{*splat}', (req, res) => {
   res.status(404).render('notFound');
 });
 
 app.use((err, req, res, next) => {
   const { statusCode = 500 } = err;
-  const redirectPath = err.redirectPath || 'back';
+  const redirectPath = err.redirectPath || req.get('Referrer') || '/';
+
+  console.error(err.stack);
+
+  deleteUploadedImages(req);
 
   if (!err.message) {
     err.message = 'Oh no! Something went wrong';
@@ -139,6 +136,6 @@ app.use((err, req, res, next) => {
   res.status(statusCode).redirect(redirectPath);
 });
 
-app.listen(port, () => {
-  console.log(`Serving on port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Serving on port ${process.env.PORT}`);
 });

@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const Review = require('./review');
-const format = require('date-fns/format');
-const mongoosePaginate = require('mongoose-paginate-v2');
-const { cloudinary } = require('../cloudinary');
+import mongoose, { Schema } from 'mongoose';
+import { format } from 'date-fns';
+import mongoosePaginate from 'mongoose-paginate-v2';
+import { cloudinary } from '../cloudinary.js';
+import { Review } from './review.js';
 
 const options = { toJSON: { virtuals: true } };
 
@@ -60,17 +59,20 @@ campgroundSchema.virtual('priceFormatted').get(function () {
   return Math.round((this.price + Number.EPSILON) * 100) / 100;
 });
 
-campgroundSchema.post('remove', async function (doc) {
-  if (doc) {
+campgroundSchema.post(
+  'deleteOne',
+  { document: true, query: false },
+  async function (doc) {
     await Review.deleteMany({ _id: { $in: doc.reviews } });
+
     for (let image of doc.images) {
       await cloudinary.uploader.destroy(image.filename);
     }
   }
-});
+);
 
 campgroundSchema.plugin(mongoosePaginate);
 
 const Campground = mongoose.model('Campground', campgroundSchema);
 
-module.exports = Campground;
+export { Campground };

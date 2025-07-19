@@ -1,6 +1,6 @@
-const Campground = require('../models/campground');
-const User = require('../models/user');
-const { cloudinary } = require('../cloudinary');
+import { Campground } from '../models/campground.js';
+import { User } from '../models/user.js';
+import { cloudinary, uploadImageFromMemory } from '../cloudinary.js';
 
 const index = async (req, res) => {
   if (!req.query.page) {
@@ -36,14 +36,16 @@ const renderNewForm = (req, res) => {
 const createCampground = async (req, res) => {
   const currentUser = req.user;
   const newCampground = new Campground(req.body.campground);
+  const uploadPromises = req.files.map(uploadImageFromMemory);
+  const uploadResults = await Promise.all(uploadPromises);
 
+  newCampground.images = uploadResults.map(({ secure_url, public_id }) => ({
+    url: secure_url,
+    filename: public_id,
+  }));
   newCampground.geometry = res.locals.geometry;
   newCampground.location = res.locals.location;
   newCampground.author = currentUser._id;
-  newCampground.images = req.files.map((f) => ({
-    url: f.path,
-    filename: f.filename,
-  }));
 
   await newCampground.save();
   await associateCampgroundWithUser(currentUser, newCampground);
@@ -59,14 +61,14 @@ const associateCampgroundWithUser = async (user, camp) => {
 };
 
 const showCampground = async (req, res) => {
-  const campground = await res.locals.campground
-    .populate({
+  const campground = await res.locals.campground.populate([
+    {
       path: 'reviews',
       options: { sort: { dateCreated: -1 } },
       populate: { path: 'author' },
-    })
-    .populate('author')
-    .execPopulate();
+    },
+    'author',
+  ]);
 
   res.render('campgrounds/show', { campground });
 };
@@ -79,33 +81,41 @@ const renderEditForm = async (req, res) => {
 
 const updateCampground = async (req, res) => {
   const campground = res.locals.campground;
-  const newImages = req.files.map((f) => ({
-    url: f.path,
-    filename: f.filename,
+  const pictureFiles = req.files;
+  const picturesToDelete = req.body.deleteImages;
+
+  const uploadPromises = pictureFiles.map(uploadImageFromMemory);
+
+  const uploadResults = await Promise.all(uploadPromises);
+  const newImages = uploadResults.map(({ secure_url, public_id }) => ({
+    url: secure_url,
+    filename: public_id,
   }));
 
   await campground.updateOne({ ...req.body.campground });
 
+  campground.images.push(...newImages);
   campground.geometry = res.locals.geometry;
   campground.location = res.locals.location;
-  campground.images.push(...newImages);
 
-  await deleteImagesUserChose(req, campground);
+  if (picturesToDelete) {
+    await deletePictures(picturesToDelete, campground);
+  }
+
   await campground.save();
 
   req.flash('success', 'Successfully updated campground!');
   res.redirect(`/campgrounds/${campground._id}`);
 };
 
-const deleteImagesUserChose = async (req, camp) => {
-  if (req.body.deleteImages) {
-    for (let filename of req.body.deleteImages) {
-      await cloudinary.uploader.destroy(filename);
-    }
-    await camp.updateOne({
-      $pull: { images: { filename: { $in: req.body.deleteImages } } },
-    });
+const deletePictures = async (picturesToDelete, campground) => {
+  for (let filename of picturesToDelete) {
+    await cloudinary.uploader.destroy(filename);
   }
+
+  await campground.updateOne({
+    $pull: { images: { filename: { $in: picturesToDelete } } },
+  });
 };
 
 const destroyCampground = async (req, res) => {
@@ -116,13 +126,13 @@ const destroyCampground = async (req, res) => {
     await user.updateOne({ $pull: { campgrounds: campground._id } });
   }
 
-  await campground.remove();
+  await campground.deleteOne();
 
   req.flash('success', 'Successfully deleted campground!');
   res.redirect('/campgrounds');
 };
 
-module.exports = {
+export {
   index,
   renderNewForm,
   createCampground,
