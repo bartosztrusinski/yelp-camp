@@ -1,13 +1,6 @@
 import { Router } from 'express';
-const router = Router();
 import passport from 'passport';
 import { saveImageToMemory } from '../cloudinary.js';
-// import {
-//   passwordResetBruteForce,
-//   passwordChangeBruteForce,
-//   loginBruteForce,
-//   registerBruteForce,
-// } from '../utils/expressBrute.js';
 import {
   renderLogin,
   login,
@@ -41,37 +34,43 @@ import {
   isValidPasswordToken,
   isPasswordCorrect,
 } from '../middleware.js';
+import {
+  authLimiter,
+  registrationLimiter,
+  contentLimiter,
+  mailLimiter,
+  resetLimiter,
+} from '../utils/rateLimit.js';
+
+const router = Router();
 
 router
   .route('/login')
   .get(isLoggedOut, renderLogin)
   .post(
+    authLimiter('log in', (req) => req.body.username),
     isLoggedOut,
-    // prevent too many attempts for the same username
-    // loginBruteForce.getMiddleware({
-    //   key: (req, res, next) => next(req.body.username),
-    // }),
     isActive,
     passport.authenticate('local', {
       failureFlash: true,
       failureRedirect: '/login',
     }),
+    resetLimiter('auth:short:', (req) => req.body.username),
     login
   );
 
-router.get('/logout', isLoggedIn, logout);
+router.post('/logout', contentLimiter('log out'), isLoggedIn, logout);
 
-router.route('/register').get(isLoggedOut, renderRegister).post(
-  isLoggedOut,
-  validateUser,
-  //  registerBruteForce.prevent,
-  register
-);
+router
+  .route('/register')
+  .get(isLoggedOut, renderRegister)
+  .post(registrationLimiter, isLoggedOut, validateUser, register);
 
 router
   .route('/users/:id')
   .get(isValidUserID, renderUserProfile)
   .patch(
+    contentLimiter('update a profile'),
     isLoggedIn,
     isValidUserID,
     isProfileOwnerOrAdmin,
@@ -80,15 +79,21 @@ router
     updateUserProfile
   )
   .put(
+    authLimiter('change a password'),
     isLoggedIn,
     isValidUserID,
     isProfileOwnerOrAdmin,
     validatePassword,
-    // passwordChangeBruteForce.prevent,
     isPasswordCorrect,
     changePassword
   )
-  .delete(isLoggedIn, isValidUserID, isProfileOwnerOrAdmin, deleteUser);
+  .delete(
+    contentLimiter('delete a user'),
+    isLoggedIn,
+    isValidUserID,
+    isProfileOwnerOrAdmin,
+    deleteUser
+  );
 
 router.get(
   '/users/:id/edit',
@@ -109,26 +114,39 @@ router.get(
 router
   .route('/resend')
   .get(isLoggedOut, renderVerifyForm)
-  .post(isLoggedOut, sendVerificationMail);
+  .post(
+    mailLimiter('resend a verification email', (req) => req.body.email),
+    isLoggedOut,
+    sendVerificationMail
+  );
 
-router.get('/verify/:token', isLoggedOut, isValidVerificationToken, verifyUser);
+router.get(
+  '/verify/:token',
+  authLimiter('verify an account', (req) => req.params.token),
+  isLoggedOut,
+  isValidVerificationToken,
+  resetLimiter('auth:short:', (req) => req.params.token),
+  verifyUser
+);
 
 router
   .route('/forgot')
   .get(isLoggedOut, renderForgotForm)
-  .post(isLoggedOut, sendPasswordResetMail);
+  .post(
+    mailLimiter('send a password reset email', (req) => req.body.email),
+    isLoggedOut,
+    sendPasswordResetMail
+  );
 
 router
   .route('/reset/:token')
   .get(isLoggedOut, isValidPasswordToken, renderResetForm)
   .post(
+    authLimiter('reset a password', (req) => req.params.token),
     isLoggedOut,
     isValidPasswordToken,
-    // prevent too many attempts for the same token
-    // passwordResetBruteForce.getMiddleware({
-    //   key: (req, res, next) => next(req.params.token),
-    // }),
     validatePassword,
+    resetLimiter('auth:short:', (req) => req.params.token),
     resetPassword
   );
 

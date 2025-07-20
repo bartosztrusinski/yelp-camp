@@ -16,6 +16,7 @@ import LocalStrategy from 'passport-local';
 import { User } from './models/user.js';
 import { redisClient } from './redis.js';
 import { deleteUploadedImages } from './cloudinary.js';
+import { globalLimiter } from './utils/rateLimit.js';
 import {
   scriptSrcUrls,
   styleSrcUrls,
@@ -106,6 +107,8 @@ app.use((req, res, next) => {
   res.locals.error = req.flash('error');
   next();
 });
+
+app.use(globalLimiter);
 
 app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);

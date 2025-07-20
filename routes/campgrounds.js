@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { saveImageToMemory } from '../cloudinary.js';
-// import { campgroundCreateBruteForce } from '../utils/expressBrute.js';
 import {
   index,
   createCampground,
@@ -17,16 +16,20 @@ import {
   validateImageCount,
   isValidCampgroundID,
 } from '../middleware.js';
+import { contentLimiter } from '../utils/rateLimit.js';
 
 const router = Router();
 
-router.route('/').get(index).post(
-  isLoggedIn,
-  saveImageToMemory.array('image', 3),
-  validateCampground,
-  // campgroundCreateBruteForce.prevent,
-  createCampground
-);
+router
+  .route('/')
+  .get(index)
+  .post(
+    contentLimiter('create a campground'),
+    isLoggedIn,
+    saveImageToMemory.array('image', 3),
+    validateCampground,
+    createCampground
+  );
 
 router.get('/new', isLoggedIn, renderNewForm);
 
@@ -34,6 +37,7 @@ router
   .route('/:id')
   .get(isValidCampgroundID, showCampground)
   .put(
+    contentLimiter('update a campground'),
     isLoggedIn,
     isValidCampgroundID,
     isCampAuthorOrAdmin,
@@ -43,6 +47,7 @@ router
     updateCampground
   )
   .delete(
+    contentLimiter('delete a campground'),
     isLoggedIn,
     isValidCampgroundID,
     isCampAuthorOrAdmin,

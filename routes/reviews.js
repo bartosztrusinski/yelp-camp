@@ -1,5 +1,4 @@
 import { Router } from 'express';
-// import { reviewCreateBruteForce } from '../utils/expressBrute.js';
 import { createReview, destroyReview } from '../controllers/reviews.js';
 import {
   validateReview,
@@ -8,20 +7,22 @@ import {
   isValidCampgroundID,
   isValidReviewID,
 } from '../middleware.js';
+import { contentLimiter } from '../utils/rateLimit.js';
 
 const router = Router({ mergeParams: true });
 
 router.post(
   '/',
+  contentLimiter('create a review'),
   isLoggedIn,
   isValidCampgroundID,
   validateReview,
-  // reviewCreateBruteForce.prevent,
   createReview
 );
 
 router.delete(
   '/:reviewId',
+  contentLimiter('delete a review'),
   isLoggedIn,
   isValidCampgroundID,
   isValidReviewID,
