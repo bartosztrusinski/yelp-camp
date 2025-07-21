@@ -40,8 +40,7 @@ const isActive = async (req, res, next) => {
 
   if (user && !user.isActive) {
     throw new ExpressError(
-      `Your email has not been verified. 
-      Please click <a href='/resend'>here</a> to resend token!`,
+      `Your email has not been verified. Please click <a href='/resend'>here</a> to resend a token!`,
       400,
       '/login'
     );
