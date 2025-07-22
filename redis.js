@@ -8,7 +8,7 @@ const redisClient = await createClient({
     port: process.env.REDIS_PORT,
   },
 })
-  .on('error', (err) => console.log('Redis Client error: ', err))
+  .on('error', (err) => console.error('Redis Client error: ', err))
   .on('connect', () => console.log('Connected to Redis'))
   .connect();
 
