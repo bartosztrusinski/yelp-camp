@@ -47,12 +47,14 @@ app.use(methodOverride('_method'));
 app.use(cookieParser(process.env.SECRET));
 
 const sessionConfig = {
-  name: 'session',
   secret: process.env.SECRET,
-  resave: true,
-  rolling: true,
+  resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, secure: false },
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+  },
   store: new RedisStore({
     client: redisClient,
     prefix: 'session:',
@@ -62,31 +64,30 @@ const sessionConfig = {
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1);
   sessionConfig.cookie.secure = true;
-  sessionConfig.proxy = true;
 }
 
 app.use(session(sessionConfig));
 app.use(flash());
-app.use(helmet());
-
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: [],
-      connectSrc: ["'self'", ...connectSrcUrls],
-      scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-      workerSrc: ["'self'", 'blob:'],
-      childSrc: ['blob:'],
-      objectSrc: [],
-      imgSrc: [
-        "'self'",
-        'blob:',
-        'data:',
-        'https://res.cloudinary.com/',
-        'https://images.unsplash.com/',
-      ],
-      fontSrc: ["'self'", ...fontSrcUrls],
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [],
+        connectSrc: ["'self'", ...connectSrcUrls],
+        scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+        styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+        workerSrc: ["'self'", 'blob:'],
+        childSrc: ['blob:'],
+        objectSrc: [],
+        imgSrc: [
+          "'self'",
+          'blob:',
+          'data:',
+          'https://res.cloudinary.com/',
+          'https://images.unsplash.com/',
+        ],
+        fontSrc: ["'self'", ...fontSrcUrls],
+      },
     },
   })
 );
