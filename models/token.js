@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 
 const Token = new Schema({
   _id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  token: { type: 'String', default: nanoid, required: true },
+  token: { type: 'String', default: () => nanoid(), required: true },
   dateCreated: { type: Date, default: Date.now, expires: 60 * 60 },
 });
 

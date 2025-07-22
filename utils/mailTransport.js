@@ -59,7 +59,7 @@ const passwordResetMail = (user, token) => ({
     Thank You!\n`,
   html: `<h1>Hello, ${user.username}!</h1>
     <p>Please reset your password by clicking the link below. Thank You!</p>
-    <a href='${process.env.BASE_URL}/reset/${token}?id=${user._id}'>Click here to verify</a>`,
+    <a href='${process.env.BASE_URL}/reset/${token}?id=${user._id}'>Click here to reset</a>`,
 });
 
 const contactMail = (name, email, message) => ({
