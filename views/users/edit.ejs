@@ -51,6 +51,7 @@
                 id="name"
                 name="name"
                 placeholder="Name"
+                autocomplete="name"
                 value="<%= user.name %>"
                 minlength="5"
                 maxlength="30"
@@ -86,7 +87,7 @@
                   name="phoneNumber"
                   pattern="[0-9]{1,3} [0-9]{4,11}"
                   value="<%= user.phoneNumber %>" />
-                <label for="phoneNumber">
+                <label for="phone-number">
                   Phone Number
                 </label>
                 <div class="valid-feedback mb-2">Looks good!</div>
