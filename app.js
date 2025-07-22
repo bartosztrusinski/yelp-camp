@@ -139,6 +139,4 @@ app.use((err, req, res, next) => {
   res.status(statusCode).redirect(redirectPath);
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Serving on port ${process.env.PORT}`);
-});
+export default app;
