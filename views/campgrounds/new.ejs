@@ -1,5 +1,4 @@
-<%- layout('layouts/boilerplate') %>
-<% block('head').append(`
+<%- layout('layouts/boilerplate') %> <% block('head').append(`
 <script defer src="/js/validateForms.js"></script>
 `) %>
 
@@ -22,8 +21,13 @@
                 type="text"
                 id="title"
                 name="campground[title]"
-                required />
+                required
+                minlength="3"
+                maxlength="30" />
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Title must be between 3 and 30 characters
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label lead" for="location">Location</label>
@@ -32,34 +36,52 @@
                 type="text"
                 id="location"
                 name="campground[location]"
-                required />
+                required
+                minlength="3"
+                maxlength="100" />
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Location must be between 3 and 100 characters
+              </div>
             </div>
             <div class="mb-3">
-              <label class="form-label lead" for="price">Campground Price</label>
+              <label class="form-label lead" for="price">Price</label>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="price-label">$</span>
                 <input
-                  type="text"
-                  class="form-control"
+                  type="number"
+                  class="form-control rounded-end"
                   aria-label="price"
                   aria-describedby="price-label"
                   id="price"
                   name="campground[price]"
-                  placeholder="0.00"
-                  required />
+                  value="0"
+                  step="0.1"
+                  required
+                  min="0"
+                  max="100" />
                 <div class="valid-feedback">Looks good!</div>
+                <div class="invalid-feedback">
+                  Price must be in the range of $0 to $100
+                </div>
               </div>
             </div>
             <div class="mb-3">
-              <label class="form-label lead" for="description">Description</label>
+              <label class="form-label lead" for="description">
+                Description
+              </label>
               <textarea
                 class="form-control"
                 type="text"
                 id="description"
                 name="campground[description]"
-                required></textarea>
+                required
+                minlength="10"
+                maxlength="500"></textarea>
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Description must be between 10 and 500 characters
+              </div>
             </div>
             <div class="mb-3">
               <label for="image" class="form-label lead">Upload Images</label>
@@ -71,7 +93,7 @@
                 aria-describedby="imageUploadInfo"
                 multiple />
               <div id="imageUploadInfo" class="form-text">
-                You can upload up to 3 images.
+                You can upload up to 3 images
               </div>
             </div>
             <div
@@ -82,14 +104,15 @@
                   width="16"
                   height="16"
                   fill="currentColor"
-                  class="bi bi-caret-left-fill"
                   viewBox="0 0 16 16">
                   <path
                     d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
                 </svg>
                 <span class="align-middle">Back To Campgrounds</span>
               </a>
-              <button class="btn btn-outline-success mb-3">Add Campground</button>
+              <button class="btn btn-outline-success mb-3">
+                Add Campground
+              </button>
             </div>
           </form>
         </div>

@@ -1,5 +1,4 @@
-<%- layout('layouts/boilerplate') %>
-<% block('head').append(`
+<%- layout('layouts/boilerplate') %> <% block('head').append(`
 <script defer src="/js/validateForms.js"></script>
 `) %>
 
@@ -32,6 +31,9 @@
                 required />
               <label class="form-label" for="email">Email address</label>
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Please enter your email address
+              </div>
             </div>
             <div class="d-grid mt-4">
               <button class="btn btn-success">Send</button>

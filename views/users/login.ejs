@@ -1,5 +1,4 @@
-<%- layout('layouts/boilerplate') %>
-<% block('head').append(`
+<%- layout('layouts/boilerplate') %> <% block('head').append(`
 <link rel="stylesheet" href="/css/user-form.css" />
 <script defer src="/js/validateForms.js"></script>
 `) %>
@@ -30,6 +29,9 @@
                 autofocus />
               <label class="form-label" for="username">Username</label>
               <div class="valid-feedback mb-2">Looks good!</div>
+              <div class="invalid-feedback mb-2">
+                Please enter your username
+              </div>
             </div>
             <div class="form-floating">
               <input
@@ -41,6 +43,9 @@
                 required />
               <label class="form-label" for="password">Password</label>
               <div class="valid-feedback mb-2">Looks good!</div>
+              <div class="invalid-feedback mb-2">
+                Please enter your password
+              </div>
             </div>
             <div class="form-check form-switch mt-2">
               <input
@@ -49,7 +54,9 @@
                 id="rememberMe"
                 name="rememberMe"
                 value="yes" />
-              <label class="form-check-label" for="rememberMe">Remember Me</label>
+              <label class="form-check-label" for="rememberMe">
+                Remember Me
+              </label>
             </div>
             <div class="d-grid mt-4">
               <button class="btn btn-success mb-2">Sign In</button>

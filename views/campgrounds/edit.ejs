@@ -24,8 +24,13 @@
                 id="title"
                 name="campground[title]"
                 value="<%= campground.title %>"
-                required />
+                required
+                minlength="3"
+                maxlength="30" />
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Title must be between 3 and 30 characters
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label lead" for="location">Location</label>
@@ -35,35 +40,52 @@
                 id="location"
                 name="campground[location]"
                 value="<%= campground.location %>"
-                required />
+                required 
+                minlength="3"
+                maxlength="100" />
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Location must be between 3 and 100 characters
+              </div>
             </div>
             <div class="mb-3">
-              <label class="form-label lead" for="price">Campground Price</label>
+              <label class="form-label lead" for="price">Price</label>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="price-label">$</span>
                 <input
-                  type="text"
-                  class="form-control"
+                  type="number"
+                  class="form-control rounded-end"
                   aria-label="price"
                   aria-describedby="price-label"
                   id="price"
                   name="campground[price]"
-                  placeholder="0.00"
                   value="<%= campground.price %>"
-                  required />
+                  step="0.1"
+                  required
+                  min="0"
+                  max="100" />
                 <div class="valid-feedback">Looks good!</div>
+                <div class="invalid-feedback">
+                  Price must be in the range of $0 to $100
+                </div>
               </div>
             </div>
             <div class="mb-3">
-              <label class="form-label lead" for="description">Description</label>
+              <label class="form-label lead" for="description">
+                Description
+              </label>
               <textarea
                 class="form-control"
                 type="text"
                 id="description"
                 name="campground[description]"
-                required><%= campground.description %></textarea>
+                required
+                minlength="10"
+                maxlength="500"><%= campground.description %></textarea>
               <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">
+                Description must be between 10 and 500 characters
+              </div>
             </div>
             <div class="mb-4">
               <label for="image" class="form-label lead">Add Images</label>
@@ -72,7 +94,11 @@
                 type="file"
                 id="image"
                 name="image"
+                aria-describedby="imageUploadInfo"
                 multiple />
+              <div id="imageUploadInfo" class="form-text">
+                Campground must have up to 3 images in total
+              </div>
             </div>
             <div class="mb-3 row">
               <% if(campground.images.length){ %>
@@ -88,8 +114,10 @@
                     <label class="delete-image-label" for="image-<%= i %>">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="bi bi-trash-fill"
-                        viewBox="0 0 16 16">
+                        width="48"
+                        height="48"
+                        viewBox="0 0 16 16"
+                        >
                         <path
                           d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
                       </svg>
@@ -97,6 +125,7 @@
                   </div>
                   <div class="form-check form-switch">
                     <input
+                      role="switch"
                       class="form-check-input delete-image-checkbox"
                       type="checkbox"
                       id="image-<%= i %>"
@@ -115,7 +144,6 @@
                   width="16"
                   height="16"
                   fill="currentColor"
-                  class="bi bi-caret-left-fill"
                   viewBox="0 0 16 16">
                   <path
                     d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />

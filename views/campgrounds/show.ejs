@@ -177,30 +177,37 @@
             class="validated-form d-flex flex-column"
             novalidate>
             <div class="card-body">
-              <textarea
+              <div>
+                <textarea
                 name="review[body]"
                 id="body"
                 class="form-control"
                 cols="30"
                 rows="3"
                 required
+                minlength="5"
+                maxlength="500"
                 placeholder="How was your experience?"></textarea>
-              <div class="valid-feedback">Looks good!</div>
+                <div class="valid-feedback">Looks good!</div>
+                <div class="invalid-feedback">
+                  Review must be between 5 and 500 characters
+                </div>
+              </div>
 
               <div class="d-flex justify-content-end my-1">
-                <fieldset class="starability-basic">
+                <fieldset class="starability-basic user-select-none">
                   <input
                     type="radio"
                     id="no-rate"
                     class="input-no-rate"
                     name="review[rating]"
                     value="1"
-                    checked
                     aria-label="No rating." />
                   <input
                     type="radio"
                     id="first-rate1"
                     name="review[rating]"
+                    checked
                     value="1" />
                   <label for="first-rate1" title="Terrible">1 star</label>
                   <input
