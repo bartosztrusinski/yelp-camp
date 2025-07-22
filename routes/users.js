@@ -48,18 +48,23 @@ router
   .route('/login')
   .get(isLoggedOut, renderLogin)
   .post(
-    authLimiter('log in', (req) => req.body.username),
+    authLimiter('log in', 'login:', (req) => req.body.username),
     isLoggedOut,
     isActive,
     passport.authenticate('local', {
       failureFlash: true,
       failureRedirect: '/login',
     }),
-    resetLimiter('auth:short:', (req) => req.body.username),
+    resetLimiter('login:auth:short:', (req) => req.body.username),
     login
   );
 
-router.post('/logout', contentLimiter('log out'), isLoggedIn, logout);
+router.post(
+  '/logout',
+  contentLimiter('log out', 'logout:'),
+  isLoggedIn,
+  logout
+);
 
 router
   .route('/register')
@@ -70,7 +75,7 @@ router
   .route('/users/:id')
   .get(isValidUserID, renderUserProfile)
   .patch(
-    contentLimiter('update a profile'),
+    contentLimiter('update a profile', 'updateProfile:'),
     isLoggedIn,
     isValidUserID,
     isProfileOwnerOrAdmin,
@@ -79,7 +84,7 @@ router
     updateUserProfile
   )
   .put(
-    authLimiter('change a password'),
+    authLimiter('change a password', 'changePassword:'),
     isLoggedIn,
     isValidUserID,
     isProfileOwnerOrAdmin,
@@ -88,7 +93,7 @@ router
     changePassword
   )
   .delete(
-    contentLimiter('delete a user'),
+    contentLimiter('delete a user', 'deleteUser:'),
     isLoggedIn,
     isValidUserID,
     isProfileOwnerOrAdmin,
@@ -115,17 +120,21 @@ router
   .route('/resend')
   .get(isLoggedOut, renderVerifyForm)
   .post(
-    mailLimiter('resend a verification email', (req) => req.body.email),
+    mailLimiter(
+      'resend a verification email',
+      'resend:',
+      (req) => req.body.email
+    ),
     isLoggedOut,
     sendVerificationMail
   );
 
 router.get(
   '/verify/:token',
-  authLimiter('verify an account', (req) => req.params.token),
+  authLimiter('verify an account', 'verify:', (req) => req.params.token),
   isLoggedOut,
   isValidVerificationToken,
-  resetLimiter('auth:short:', (req) => req.params.token),
+  resetLimiter('verify:auth:short:', (req) => req.params.token),
   verifyUser
 );
 
@@ -133,7 +142,11 @@ router
   .route('/forgot')
   .get(isLoggedOut, renderForgotForm)
   .post(
-    mailLimiter('send a password reset email', (req) => req.body.email),
+    mailLimiter(
+      'send a password reset email',
+      'passwordReset:',
+      (req) => req.body.email
+    ),
     isLoggedOut,
     sendPasswordResetMail
   );
@@ -142,11 +155,15 @@ router
   .route('/reset/:token')
   .get(isLoggedOut, isValidPasswordToken, renderResetForm)
   .post(
-    authLimiter('reset a password', (req) => req.params.token),
+    authLimiter(
+      'reset a password',
+      'passwordReset:',
+      (req) => req.params.token
+    ),
     isLoggedOut,
     isValidPasswordToken,
     validatePassword,
-    resetLimiter('auth:short:', (req) => req.params.token),
+    resetLimiter('passwordReset:auth:short:', (req) => req.params.token),
     resetPassword
   );
 

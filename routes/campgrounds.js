@@ -24,7 +24,7 @@ router
   .route('/')
   .get(index)
   .post(
-    contentLimiter('create a campground'),
+    contentLimiter('create a campground', 'createCamp:'),
     isLoggedIn,
     saveImageToMemory.array('image', 3),
     validateCampground,
@@ -37,7 +37,7 @@ router
   .route('/:id')
   .get(isValidCampgroundID, showCampground)
   .put(
-    contentLimiter('update a campground'),
+    contentLimiter('update a campground', 'updateCamp:'),
     isLoggedIn,
     isValidCampgroundID,
     isCampAuthorOrAdmin,
@@ -47,7 +47,7 @@ router
     updateCampground
   )
   .delete(
-    contentLimiter('delete a campground'),
+    contentLimiter('delete a campground', 'deleteCamp:'),
     isLoggedIn,
     isValidCampgroundID,
     isCampAuthorOrAdmin,

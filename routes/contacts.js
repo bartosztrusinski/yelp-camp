@@ -7,6 +7,6 @@ const router = Router();
 router
   .route('/')
   .get(renderContactPage)
-  .post(mailLimiter('send a contact email'), sendContactMail);
+  .post(mailLimiter('send a contact email', 'contact:'), sendContactMail);
 
 export default router;

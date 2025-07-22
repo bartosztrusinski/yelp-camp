@@ -54,22 +54,6 @@ const globalLimiter = createLimiter({
   prefix: 'global:',
 });
 
-const authLimiter = (actionName, keyFn) => [
-  createLimiter({
-    limit: 50,
-    windowMinutes: 24 * 60,
-    prefix: 'auth:long:',
-    actionName,
-  }),
-  createLimiter({
-    limit: 10,
-    windowMinutes: 15,
-    prefix: 'auth:short:',
-    actionName,
-    keyFn,
-  }),
-];
-
 const registrationLimiter = [
   createLimiter({
     limit: 10,
@@ -85,32 +69,49 @@ const registrationLimiter = [
   }),
 ];
 
-const mailLimiter = (actionName) => [
+const authLimiter = (actionName, prefix, keyFn) => [
+  createLimiter({
+    limit: 50,
+    windowMinutes: 24 * 60,
+    prefix: `${prefix}auth:long:`,
+    actionName,
+  }),
+  createLimiter({
+    limit: 10,
+    windowMinutes: 15,
+    prefix: `${prefix}auth:short:`,
+    actionName,
+    keyFn,
+  }),
+];
+
+const mailLimiter = (actionName, prefix, keyFn) => [
   createLimiter({
     limit: 10,
     windowMinutes: 24 * 60,
-    prefix: 'mail:long:',
+    prefix: `${prefix}mail:long:`,
     actionName,
   }),
   createLimiter({
     limit: 3,
     windowMinutes: 60,
-    prefix: 'mail:short:',
+    prefix: `${prefix}mail:short:`,
     actionName,
+    keyFn,
   }),
 ];
 
-const contentLimiter = (actionName) => [
+const contentLimiter = (actionName, prefix) => [
   createLimiter({
     limit: 100,
     windowMinutes: 24 * 60,
-    prefix: 'content:long:',
+    prefix: `${prefix}content:long:`,
     actionName,
   }),
   createLimiter({
     limit: 15,
     windowMinutes: 60,
-    prefix: 'content:short:',
+    prefix: `${prefix}content:short:`,
     actionName,
   }),
 ];

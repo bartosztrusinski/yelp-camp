@@ -13,7 +13,7 @@ const router = Router({ mergeParams: true });
 
 router.post(
   '/',
-  contentLimiter('create a review'),
+  contentLimiter('create a review', 'createReview:'),
   isLoggedIn,
   isValidCampgroundID,
   validateReview,
@@ -22,7 +22,7 @@ router.post(
 
 router.delete(
   '/:reviewId',
-  contentLimiter('delete a review'),
+  contentLimiter('delete a review', 'deleteReview:'),
   isLoggedIn,
   isValidCampgroundID,
   isValidReviewID,
