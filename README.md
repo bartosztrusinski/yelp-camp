@@ -31,14 +31,16 @@ Welcome to **Yelp Camp**! Jump right in and explore our many campgrounds. Feel f
 - Node.js
 - Express.js
 - MongoDB
-- Mongoose.js
+- Mongoose ODM
 - Redis
 - Joi
 - Bootstrap
+- Mapbox
 - Cloudinary
 - Resend
 - Passport
 - date-fns
+- express-rate-limit
 - Multer
 
 ## Screenshots
