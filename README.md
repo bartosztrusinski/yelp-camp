@@ -45,5 +45,5 @@ Welcome to **Yelp Camp**! Jump right in and explore our many campgrounds. Feel f
 
 ## Screenshots
 
-<img width="1875" height="1001" alt="Screenshot 2025-07-22 192528" src="https://github.com/user-attachments/assets/9ccfec10-49ca-4583-a9e6-44cf3917b50f" />
-<img width="1888" height="1089" alt="Screenshot 2025-07-22 192604" src="https://github.com/user-attachments/assets/a3fbe760-342b-4ca9-beb5-62519fbb0db5" />
+<img width="1875" height="1001" alt="Yelp Camp homepage" src="https://github.com/user-attachments/assets/9ccfec10-49ca-4583-a9e6-44cf3917b50f" />
+<img width="1888" height="1089" alt="Yelp Camp campsite details" src="https://github.com/user-attachments/assets/a3fbe760-342b-4ca9-beb5-62519fbb0db5" />
