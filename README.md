@@ -1,6 +1,4 @@
-# Yelp Camp
-
-<img src="https://user-images.githubusercontent.com/33166095/231808549-cdca3a00-5c8a-4ee5-a9df-d22dff8ae93c.png" align="left" alt="Tent">
+# <img width="34" height="34" src="https://github.com/user-attachments/assets/8f9e484b-94e7-4716-8c63-277a816de2ad" alt="Yelp Camp logo"> Yelp Camp
 
 Welcome to **Yelp Camp**! Jump right in and explore our many campgrounds. Feel free to share some of your own and comment on others!
 
